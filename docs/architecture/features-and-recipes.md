@@ -20,6 +20,8 @@ must not create hidden runtime behavior.
 
 - Rails + Inertia React TypeScript + Vite
 - PostgreSQL
+- Solid Queue, Active Storage, and Action Mailer installed as Rails-native
+  facilities without generating user-facing workflows
 - Tailwind CSS + restrained shadcn/ui baseline
 - Health, error, empty, 404, and responsive shell states
 - Secure request/session defaults appropriate to whether auth is installed
@@ -34,9 +36,9 @@ must not create hidden runtime behavior.
 
 - Foundation
 - No authentication unless selected
-- Solid Queue remains available if Rails includes it economically; user-facing
-  operation models are not installed
-- No mail, uploads, integrations, or institutional provider code unless added
+- No user-facing operation, upload, or email workflow
+- Worker process only needs to run when the application enqueues jobs
+- No integrations or institutional provider code unless added
 
 ### `personal`
 
@@ -68,6 +70,31 @@ Proposed defaults:
 The internal profile includes no Canvas, Populi, Airtable, Circle, or Watermark
 client.
 
+## Source repository and generated applications
+
+The source repository is a runnable minimal reference application plus
+build-time tooling:
+
+```text
+app/                    # runnable minimal Rails reference application
+starter/                # capability/profile/recipe sources
+bin/new                 # creates a clean destination application
+docs/                   # starter design and maintenance context
+```
+
+`bin/new` copies the minimal app, applies the selected profile and recipes,
+omits the recipe catalog/design research/unselected providers, writes
+`.starter.yml`, and produces a normal independent Rails repository.
+
+Adding a feature later uses a checked-out, versioned copy of this starter:
+
+```text
+/path/to/rails-app-starter-kit/bin/starter add canvas --app /path/to/my-app
+```
+
+The generated application does not depend on the starter repository or an
+online generator at runtime.
+
 ## Illustrative commands
 
 Creation:
@@ -93,9 +120,8 @@ bin/starter add csv-imports
 bin/starter add canvas
 ```
 
-The exact distribution mechanism—Rails application template, local generator,
-or small starter CLI—remains an implementation decision. It must produce
-reviewable ordinary files and work non-interactively for Amp.
+The generator must produce reviewable ordinary files and work
+non-interactively for Amp.
 
 ## Receipt
 

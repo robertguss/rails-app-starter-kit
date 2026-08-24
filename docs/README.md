@@ -1,6 +1,6 @@
 # Documentation Index
 
-Status: design baseline, not implemented
+Status: foundational decisions accepted; not implemented
 
 Last updated: 2026-08-24
 

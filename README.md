@@ -49,8 +49,9 @@ will be copied into the starter.
 
 ## Status
 
-- Documentation baseline: captured for review
+- Documentation baseline: foundational decisions accepted
 - Application implementation: not started
+- Implementation authorization: not yet granted
 - GitHub repository: private repository created at
   <https://github.com/robertguss/rails-app-starter-kit>
 

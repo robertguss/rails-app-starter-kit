@@ -28,7 +28,7 @@ and validation. Each phase must leave a reviewable, passing repository.
 ### Exit criteria
 
 - Robert reviews the documents.
-- Phase-1 blockers in `open-questions.md` are answered.
+- The six foundational decisions in `open-questions.md` are accepted.
 - Robert explicitly authorizes implementation.
 
 ## Phase 1 — Runnable Rails/Inertia foundation
@@ -96,9 +96,10 @@ and validation. Each phase must leave a reviewable, passing repository.
 1. Apply Rails-generated authentication and inspect all generated behavior.
 2. Implement app-owned users, sessions, identities, and access grants with
    database constraints.
-3. Implement password login and the selected secure invitation/enrollment
-   flow.
-4. Implement owner bootstrap without a lasting backdoor.
+3. Implement password login with 24-hour, single-use, rotate-on-resend email
+   invitations that atomically create the user and claim the grant.
+4. Implement interactive bootstrap of exactly one owner without a lasting
+   backdoor, plus explicit ownership transfer and last-owner protection.
 5. Add access administration UI and grant/revoke commands.
 6. Revoke sessions immediately when a user/grant is disabled.
 7. Add Google Workspace identity adapter using stable provider subject and
@@ -155,14 +156,17 @@ and validation. Each phase must leave a reviewable, passing repository.
 
 ### Work
 
-1. Choose the creation mechanism after a focused spike: runnable minimal
-   template plus configurator, Rails application template, or a small CLI.
-2. Define capability dependencies and explicit profile expansion.
-3. Add `.starter.yml` receipt.
-4. Generate and verify `minimal`, `personal`, and `internal` fixtures.
-5. Support non-interactive flags for Amp.
-6. Report exactly which files/configuration a recipe changes.
-7. Fail unsupported combinations before partial generation where possible.
+1. Keep the source repository as a runnable minimal reference application.
+2. Add `starter/` as the non-runtime profile/capability/recipe source and
+   `bin/new` as the clean destination generator.
+3. Exclude starter-only research/catalog files and unselected provider code from
+   generated apps.
+4. Define capability dependencies and explicit profile expansion.
+5. Add `.starter.yml` receipt.
+6. Generate and verify `minimal`, `personal`, and `internal` fixtures.
+7. Support non-interactive flags for Amp.
+8. Report exactly which files/configuration a recipe changes.
+9. Fail unsupported combinations before partial generation where possible.
 
 ### Verification
 

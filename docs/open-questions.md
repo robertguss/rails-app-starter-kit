@@ -3,15 +3,19 @@
 Last updated: 2026-08-24
 
 These questions are deliberately visible so future agents do not silently turn
-proposals into facts.
+proposals into facts. Robert accepted all six foundational decisions below on
+2026-08-24. No unresolved design blocker remains, but Phase 1 implementation
+still requires separate explicit authorization.
 
-## Blockers before starter implementation
+## Resolved foundational decisions
 
 ### 1. Source-repository shape
 
-Recommended: make this repository a runnable minimal reference application plus
-a non-runtime configurator/recipe catalog that can generate clean destination
-apps. Alternatives are a pure Rails application template or a separate CLI.
+This repository will be a runnable minimal reference application plus a
+non-runtime `starter/` configurator/recipe catalog and `bin/new` generator.
+Generated destination apps exclude the catalog, design-only documentation, and
+unselected providers. Adding a recipe later uses a checked-out version of this
+starter; generated apps have no runtime dependency on it.
 
 Decision criteria:
 
@@ -25,43 +29,36 @@ Decision criteria:
 
 ### 2. Exact supported versions
 
-Confirm current stable Ruby, Rails, Inertia Rails, React, Vite Rails, Tailwind,
-and shadcn compatibility at implementation time. Do not assume version numbers
-from memory or this document.
+Resolve and pin current compatible stable Ruby, Rails, Inertia Rails, React,
+Vite Rails, Tailwind, and shadcn versions when Phase 1 starts. Do not assume
+version numbers from memory or this design snapshot.
 
-### 3. Ruby testing style
+### 3. Testing style
 
-The recommendation is Minitest because it is Rails-native and reduces baseline
-dependencies. Confirm whether Robert wants Minitest or RSpec before tests
-establish repository-wide patterns.
+Use Minitest for Rails, Vitest with React Testing Library for frontend
+components, and Playwright for browser flows.
 
 ### 4. Password enrollment and recovery
 
-Choose the exact closed-registration flow:
-
-- grant plus emailed single-use invitation/password-set token; or
-- owner-created user plus emailed password-set token.
-
-Define token expiry, replay protection, resend, recovery, email change, and
-behavior when no transactional email provider is installed.
+The owner creates an email grant. A 24-hour, single-use invitation proves inbox
+control before one transaction creates the user, claims the grant, sets the
+password, consumes the invitation, and creates a session. Resending rotates the
+token; revocation invalidates invitations and sessions. Normal browser
+enrollment/recovery requires email. Owner-operated CLI tasks support deliberate
+no-email deployments.
 
 ### 5. Owner/admin semantics
 
-Decide whether the baseline has:
-
-- exactly one owner plus ordinary members;
-- multiple access administrators; or
-- a simple admin marker.
-
-Avoid turning this into generic RBAC. Define owner transfer and last-owner
-protection.
+Use exactly one owner plus ordinary members. Ownership is explicitly
+transferable, and the last owner cannot be deleted, revoked, or demoted. Product
+permissions remain app-local rather than becoming generic RBAC.
 
 ### 6. Starter profile contents
 
-Confirm whether Solid Queue, Active Storage, and Action Mailer remain installed
-in the minimal Rails foundation when economically provided by Rails, or are
-physically omitted until selected. User-facing operations/imports must remain
-optional regardless.
+Keep Solid Queue, Active Storage, and Action Mailer installed as Rails-native
+foundation facilities. Profiles decide which workflows and deployment roles
+are generated/configured. Integrations, operation models, imports, and provider
+code remain optional.
 
 ## Decisions needed during baseline implementation
 

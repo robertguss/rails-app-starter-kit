@@ -1,6 +1,6 @@
 # Authentication and Access
 
-Status: accepted direction; password enrollment mechanics remain open
+Status: accepted direction
 
 Last updated: 2026-08-24
 
@@ -17,7 +17,7 @@ Recommended conceptual tables:
 
 ```text
 users
-  id, email, name, password_digest?, active, owner/admin marker, timestamps
+  id, email, name, password_digest?, active, role (owner/member), timestamps
 
 identities
   user_id, provider, provider_subject, provider_email, metadata, timestamps
@@ -87,15 +87,30 @@ the baseline. Password authentication is independently enableable for personal
 apps.
 
 Closed registration means an arbitrary visitor must not be able to choose a
-granted email and set its password. The implementation phase must choose and
-test one safe enrollment flow:
+granted email and set its password. The accepted enrollment flow is:
 
-- a time-limited, single-use invitation token delivered to the granted email;
-  or
-- owner-created user plus a time-limited password-setup token.
+1. The owner creates an active grant for an email address.
+2. The app emails a single-use invitation that expires after 24 hours.
+3. Opening the invitation proves control of that inbox.
+4. The recipient chooses a password.
+5. One transaction creates the user, claims the grant, stores the password
+   digest, consumes the invitation, and creates the application session.
+6. Resending an invitation rotates and invalidates the previous token.
+7. Revoking the grant invalidates outstanding invitations and active sessions.
 
-Bootstrap of the first owner may use a one-time task or deployment-only
-environment input. It must not create a permanent production backdoor.
+Store only a digest of the invitation token. Password recovery follows the
+same time-limited, single-use, rotate-on-resend discipline.
+
+Bootstrap exactly one initial owner through an interactive deployment task:
+
+```text
+bin/rails access:bootstrap
+```
+
+The task prompts privately for email and password and must refuse to create a
+second owner. It does not create a permanent web setup route. An app
+deliberately operated without transactional email may use owner-run CLI
+invitation/reset tasks; normal browser enrollment and recovery require email.
 
 ### Magic links and passkeys
 
@@ -108,7 +123,7 @@ than hand-building many advanced auth features.
 
 Every authenticated starter should include:
 
-- an owner/admin access screen at `/settings/access`;
+- an owner access screen at `/settings/access`;
 - grant and revoke operations;
 - commands such as
   `bin/rails access:grant[user@example.com]` and
@@ -118,8 +133,10 @@ Every authenticated starter should include:
 - negative tests proving unauthorized identities cannot create users or
   sessions.
 
-The baseline does not need generic RBAC. The owner/admin distinction exists to
-manage access. Applications may add a small local operator permission for
+The baseline has exactly one owner and ordinary members. The owner manages
+access and may explicitly transfer ownership; the app prevents deleting,
+revoking, or demoting the last owner. Ownership does not become generic domain
+authorization. Applications may add a small local operator permission for
 sensitive external commands.
 
 ## Family applications
