@@ -5,7 +5,8 @@ Last updated: 2026-08-24
 These questions are deliberately visible so future agents do not silently turn
 proposals into facts. Robert accepted the six foundational decisions and all
 cross-cutting implementation defaults below on 2026-08-24, then explicitly
-authorized Phases 1–7. Phases 1–5 are implemented.
+authorized Phases 1–7. All seven implementation phases are present; hosted Phase
+7 validation remains gated on approved disposable targets and credentials.
 
 ## Resolved foundational decisions
 

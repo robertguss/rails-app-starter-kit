@@ -1,6 +1,6 @@
 # Baseline Starter-Kit Implementation Plan
 
-Status: Phases 1–5 implemented; Phases 6–7 authorized and in progress
+Status: Phases 1–7 implemented; Phase 7 hosted validation gates remain external
 
 Last updated: 2026-08-24
 
@@ -216,6 +216,9 @@ Status: implemented on 2026-08-24. See the
 
 ## Phase 6 — Internal/integrations capability
 
+Status: implemented on 2026-08-24. See the
+[Phase 6 implementation record](implementation/phase-6.md).
+
 This phase creates provider-neutral operational support, not provider clients.
 
 ### Work
@@ -257,6 +260,11 @@ Use a local fake provider to prove:
 - No Canvas/Populi/Airtable/Circle/Watermark behavior exists in core output.
 
 ## Phase 7 — Deployment recipes and baseline release
+
+Status: locally implemented on 2026-08-24. See the
+[Phase 7 implementation record](implementation/phase-7.md). Hosted exe.dev,
+Render, and Fly deployment/restore validation requires disposable targets and
+credentials and is not claimed.
 
 ### Work
 

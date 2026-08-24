@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: starter-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /ready
+    preDeployCommand: bin/release
+    envVars: &app_env
+      - key: DATABASE_URL
+        fromDatabase:
+          name: starter-postgres
+          property: connectionString
+      - key: SECRET_KEY_BASE
+        sync: false
+      - key: APP_HOST
+        sync: false
+      - key: FORCE_SSL
+        value: "true"
+      - key: MAIL_DELIVERY_METHOD
+        value: none
+      - key: STORAGE_SERVICE
+        value: s3
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+  - type: worker
+    name: starter-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    dockerCommand: bin/jobs start
+    envVars: *app_env
+
+databases:
+  - name: starter-postgres
+    plan: free

@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "yaml"
+
+version = File.read("VERSION").strip
+receipt = File.exist?("starter/manifest.yml") ? "starter/manifest.yml" : ".starter.yml"
+manifest_version = YAML.safe_load_file(receipt).fetch("starter_version").to_s
+abort "VERSION and starter receipt version differ" unless version == manifest_version
+abort "Changelog is missing release #{version}" unless File.read("CHANGELOG.md").include?("## #{version}")
+
+render = YAML.safe_load_file("render.yaml", aliases: true)
+services = render.fetch("services")
+abort "Render must define one web and one worker" unless services.map { |s| s["type"] }.sort == %w[web worker]
+abort "Render services must use Dockerfile" unless services.all? { |s| s["runtime"] == "docker" && s["dockerfilePath"] == "./Dockerfile" }
+web = services.find { |s| s["type"] == "web" }
+abort "Render release/readiness missing" unless web["preDeployCommand"] == "bin/release" && web["healthCheckPath"] == "/ready"
+
+fly = File.read("fly.toml")
+%w[release_command web worker http_service].each { |token| abort "Fly missing #{token}" unless fly.include?(token) }
+abort "Fly public service must target web only" unless fly.include?('processes = ["web"]')
+
+compose = YAML.safe_load_file("compose.yaml", aliases: true)
+%w[postgres release web worker].each { |role| abort "Compose missing #{role}" unless compose.fetch("services").key?(role) }
+public_default = compose.fetch("services").select { |_name, service| service["ports"] && !service["profiles"] }.keys
+abort "Only web may publish a default Compose port" unless public_default == [ "web" ]
+
+puts "deployment artifacts: valid"

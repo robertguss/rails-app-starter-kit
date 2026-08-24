@@ -1,0 +1,30 @@
+app = "replace-with-your-app-name"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[deploy]
+  release_command = "bin/release"
+
+[processes]
+  web = "bin/rails server --binding 0.0.0.0"
+  worker = "bin/jobs start"
+
+[env]
+  PORT = "3000"
+  FORCE_SSL = "true"
+  MAIL_DELIVERY_METHOD = "none"
+  STORAGE_SERVICE = "s3"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  processes = ["web"]
+
+  [[http_service.checks]]
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "20s"
+    method = "GET"
+    path = "/ready"

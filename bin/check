@@ -27,6 +27,7 @@ run "Production eager load" env RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin
 run "Rails security scan" bundle exec brakeman --no-pager --quiet
 run "Ruby dependency audit" bundle exec bundle-audit check --update
 run "JavaScript dependency audit" pnpm audit --audit-level high --prod
+run "Deployment descriptors" script/validate-deployment
 run "Browser tests" pnpm test:browser
 if [[ -d starter && "${STARTER_SKIP_PROFILE_CHECKS:-0}" != "1" ]]; then
   run "Generated profile matrix" script/verify-profiles

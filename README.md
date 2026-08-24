@@ -6,8 +6,9 @@ personal or family applications.
 The project contains a runnable minimal Rails/Inertia reference app,
 deterministic developer/CI/Amp Orb workflow, Rails-native jobs/files/mail,
 portable image and recovery tooling, and build-time profiles for first-party
-closed-access authentication. Authorized implementation of the remaining
-baseline phases is in progress.
+closed-access authentication. The internal profile adds provider-neutral
+operations and an optional OTLP boundary; thin host recipes complete the local
+baseline.
 
 ## Why this project exists
 
@@ -52,10 +53,11 @@ bin/new staff-tool --profile internal --path ../staff-tool --non-interactive
 ```
 
 `minimal` has no authentication, `personal` installs password closed access, and
-`internal` installs Google Workspace closed access. Each output records its
-expanded build-time selection in `.starter.yml`; production code never reads
-that receipt as a feature registry. A versioned starter checkout can apply an
-additive recipe and report every changed file:
+`internal` installs Google Workspace closed access plus durable integration
+operations, a credential-free fake-provider proof, and optional OTLP export.
+Each output records its expanded build-time selection in `.starter.yml`;
+production code never reads that receipt as a feature registry. A versioned
+starter checkout can apply an additive recipe and report every changed file:
 
 ```text
 bin/starter add upload-workflow --app ../family-app
@@ -91,7 +93,8 @@ will be copied into the starter.
 
 - Documentation baseline: foundational and cross-cutting implementation defaults
   accepted
-- Application implementation: Phases 1–5 complete; Phases 6–7 in progress
+- Application implementation: Phases 1–7 complete; hosted deployment validation
+  remains blocked without approved disposable targets and credentials
 - Implementation authorization: Phases 1–7 granted
 - GitHub repository: private repository created at
   <https://github.com/robertguss/rails-app-starter-kit>

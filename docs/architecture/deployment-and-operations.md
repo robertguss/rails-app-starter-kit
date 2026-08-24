@@ -23,10 +23,9 @@ network, volume, secret, and health configuration only.
 Dockerfile
 compose.yaml
 .env.example
-render.yaml                  # optional generated deployment recipe
-fly.toml                     # optional generated deployment recipe
+render.yaml                  # replaceable Render deployment recipe
+fly.toml                     # replaceable Fly deployment recipe
 bin/docker-entrypoint
-bin/deploy-exe
 bin/backup
 bin/restore
 docs/deployment/
@@ -34,12 +33,13 @@ docs/deployment/
   render.md
   fly.md
   generic-vps.md
-  backups.md
+  operations.md
+  releases-and-migration.md
 ```
 
 The shared image, Compose topology, entrypoint, release command, backup tools,
-and operator runbook are implemented. Phase 7 owns the thin host-specific files
-and deployment guides.
+and operator runbook are implemented. Phase 7 supplies the thin host-specific
+files and deployment guides.
 
 ## Compose topology
 

@@ -5,12 +5,14 @@ application starter kit.
 
 ## Current phase
 
-Phases 1–5 are implemented; Phases 6–7 are authorized. The runnable source is
-the unauthenticated `minimal` foundation. Authentication is installed only into
-generated profiles and remains closed-access: never store raw auth tokens,
-bypass active grants, weaken the single-owner database/application safeguards,
-or expose agent login outside development and explicit non-production
-browser-test mode.
+Phases 1–7 are implemented. The runnable source is the unauthenticated `minimal`
+foundation. Authentication is installed only into generated profiles and remains
+closed-access: never store raw auth tokens, bypass active grants, weaken the
+single-owner database/application safeguards, or expose agent login outside
+development and explicit non-production browser-test mode. Integration
+operations, Faraday, fake-provider fixtures, and optional OTLP export are
+build-time `internal` capabilities only. Never put institutional-provider
+behavior or integration machinery into source, `minimal`, or `personal` output.
 
 Robert accepted the foundational preimplementation decisions and cross-cutting
 implementation defaults recorded in `docs/decision-register.md` on 2026-08-24.

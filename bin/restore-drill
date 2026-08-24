@@ -39,12 +39,19 @@ restored_migrations="$(psql "$target_url" -XAtqc 'SELECT count(*) FROM schema_mi
 [[ "$expected_migrations" == "$restored_migrations" ]]
 
 for table in users solid_queue_jobs active_storage_blobs; do
+  expected_table="$(psql "$source_url" -XAtqc "SELECT to_regclass('public.${table}') IS NOT NULL")"
   restored_table="$(psql "$target_url" -XAtqc "SELECT to_regclass('public.${table}') IS NOT NULL")"
-  [[ "$restored_table" == "t" ]]
+  [[ "$restored_table" == "$expected_table" ]]
 done
 
 expected_storage_entries="$(tar --list --file "$backup_dir/storage.tar.gz" | wc -l)"
 restored_storage_entries="$(( $(find "$storage_root" -mindepth 1 | wc -l) + 1 ))"
 [[ "$expected_storage_entries" == "$restored_storage_entries" ]]
+
+DATABASE_URL="$target_url" ACTIVE_STORAGE_ROOT="$storage_root" bin/rails runner '
+  missing = ActiveStorage::Blob.find_each.reject { |blob| blob.service.exist?(blob.key) }
+  abort "Restored Active Storage is missing #{missing.size} object(s)" if missing.any?
+  puts "Restored application records and #{ActiveStorage::Blob.count} stored object(s) are readable"
+'
 
 echo "Restore drill passed for disposable database $target_database"
