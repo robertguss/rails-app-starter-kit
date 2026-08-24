@@ -95,13 +95,13 @@ exceptions shown to users.
 
 Choose deliberately per workflow:
 
-| Strategy | Use when |
-|---|---|
-| Live fetch | Small current lookup where latency and availability are acceptable |
-| Reference cache | Stable lists such as terms, projects, or spaces improve selectors and API usage |
-| Durable snapshot | Staff need historical reports, latest-successful fallback, or workflow continuity |
-| Derived cache | Traversal/calculation is expensive and source changes slowly |
-| Mirror/reconciliation | Another system explicitly needs a maintained copy |
+| Strategy              | Use when                                                                          |
+| --------------------- | --------------------------------------------------------------------------------- |
+| Live fetch            | Small current lookup where latency and availability are acceptable                |
+| Reference cache       | Stable lists such as terms, projects, or spaces improve selectors and API usage   |
+| Durable snapshot      | Staff need historical reports, latest-successful fallback, or workflow continuity |
+| Derived cache         | Traversal/calculation is expensive and source changes slowly                      |
+| Mirror/reconciliation | Another system explicitly needs a maintained copy                                 |
 
 Provider-native business objects normally remain canonical remotely. The app
 owns its snapshots, cases, operation state, annotations, and audit history.

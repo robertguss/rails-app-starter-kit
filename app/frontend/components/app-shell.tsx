@@ -53,14 +53,20 @@ export function AppShell({ children }: { children: ReactNode }) {
       </a>
       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-3 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-semibold tracking-tight"
+          >
             <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground">
               <BlocksIcon className="size-4" aria-hidden="true" />
             </span>
             <span>Rails Starter</span>
           </Link>
 
-          <nav className="ml-auto hidden items-center gap-1 md:flex" aria-label="Primary navigation">
+          <nav
+            className="ml-auto hidden items-center gap-1 md:flex"
+            aria-label="Primary navigation"
+          >
             {navigation.map((item) => (
               <NavigationLink key={item.href} {...item} />
             ))}
@@ -70,16 +76,26 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ThemeToggle />
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open navigation">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  aria-label="Open navigation"
+                >
                   <MenuIcon />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[min(22rem,85vw)]">
                 <SheetHeader>
                   <SheetTitle>Rails Starter</SheetTitle>
-                  <SheetDescription>Foundation state previews and health.</SheetDescription>
+                  <SheetDescription>
+                    Foundation state previews and health.
+                  </SheetDescription>
                 </SheetHeader>
-                <nav className="flex flex-col gap-1 px-4" aria-label="Mobile navigation">
+                <nav
+                  className="flex flex-col gap-1 px-4"
+                  aria-label="Mobile navigation"
+                >
                   {navigation.map((item) => (
                     <SheetClose asChild key={item.href}>
                       <NavigationLink {...item} />

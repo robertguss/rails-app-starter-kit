@@ -2,7 +2,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export function LoadingState() {
   return (
-    <section aria-busy="true" aria-label="Loading content" className="space-y-6 rounded-xl border p-6">
+    <section
+      aria-busy="true"
+      aria-label="Loading content"
+      className="space-y-6 rounded-xl border p-6"
+    >
       <div className="flex items-center gap-4">
         <Skeleton className="size-12 rounded-full" />
         <div className="flex-1 space-y-2">

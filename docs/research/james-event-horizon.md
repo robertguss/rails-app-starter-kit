@@ -57,12 +57,12 @@ weekly mix is:
 - one Bible/Scripture Archive mission;
 - one building, engineering, or original-adventure mission.
 
-| Week | Comprehension emphasis | Arc |
-|---|---|---|
-| 1 | Find the big idea | Telescope, Moon, stars, Abram, build stability |
-| 2 | Cause and effect | Mars dust, comets, orbits, Joseph, rover wheels |
-| 3 | Systems | Star formation, invisible planets, microgravity, Nehemiah, spacesuits |
-| 4 | Deep-space synthesis | Giant stars, gravity, Earth-sized telescope, storm, black-hole finale |
+| Week | Comprehension emphasis | Arc                                                                   |
+| ---- | ---------------------- | --------------------------------------------------------------------- |
+| 1    | Find the big idea      | Telescope, Moon, stars, Abram, build stability                        |
+| 2    | Cause and effect       | Mars dust, comets, orbits, Joseph, rover wheels                       |
+| 3    | Systems                | Star formation, invisible planets, microgravity, Nehemiah, spacesuits |
+| 4    | Deep-space synthesis   | Giant stars, gravity, Earth-sized telescope, storm, black-hole finale |
 
 The black-hole reward remains rare and culminates on Day 20.
 
@@ -75,7 +75,7 @@ The black-hole reward remains rare and culminates on Day 20.
 - Bible content is a visually distinct, calm, reverent **Scripture Archive**,
   not fictionalized into the space story or turned into a boss battle.
 - Use age-appropriate original retellings and short exact ESV excerpts; do not
-  copy wording from Vos's *The Child's Story Bible*.
+  copy wording from Vos's _The Child's Story Bible_.
 - Separate what the text says from application/theological interpretation.
 - Robert and his wife review theology before release.
 - Recheck current Crossway licensing/API terms, quotation limits, and required

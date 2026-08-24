@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+run() {
+  printf '\n==> %s\n' "$1"
+  shift
+  "$@"
+}
+
+run "Environment" bin/doctor --check
+run "Ruby style" bundle exec rubocop
+run "Frontend formatting" pnpm format:check
+run "Frontend lint" pnpm lint
+run "TypeScript" pnpm typecheck
+run "Database" env RAILS_ENV=test bin/rails db:prepare
+run "Ruby tests" bin/rails test
+run "Frontend tests" pnpm test
+run "Production assets" env RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile
+run "Production eager load" env RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin/rails runner "Rails.application.eager_load!"
+run "Rails security scan" bundle exec brakeman --no-pager --quiet
+run "Ruby dependency audit" bundle exec bundle-audit check --update
+run "JavaScript dependency audit" pnpm audit --audit-level high --prod
+run "Browser tests" pnpm test:browser
+
+printf '\nAll checks passed\n'

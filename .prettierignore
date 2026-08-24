@@ -1,0 +1,15 @@
+.bundle
+.pnpm-store
+coverage
+config/database.yml
+db/schema.rb
+log
+node_modules
+playwright-report
+pnpm-lock.yaml
+public/vite*
+starter/fixtures
+storage
+test-results
+tmp
+vendor

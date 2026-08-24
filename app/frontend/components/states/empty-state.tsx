@@ -16,7 +16,9 @@ export function EmptyState({
         <InboxIcon className="size-5" aria-hidden="true" />
       </span>
       <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">{description}</p>
+      <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+        {description}
+      </p>
       {action ? <div className="mt-5">{action}</div> : null}
     </section>
   )

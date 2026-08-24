@@ -6,12 +6,7 @@ import RubyPlugin from "vite-plugin-ruby"
 import { defineConfig } from "vitest/config"
 
 export default defineConfig({
-  plugins: [
-    RubyPlugin(),
-    inertia(),
-    react(),
-    tailwindcss(),
-  ],
+  plugins: [RubyPlugin(), inertia(), react(), tailwindcss()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./app/frontend", import.meta.url)),

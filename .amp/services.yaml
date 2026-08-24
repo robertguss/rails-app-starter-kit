@@ -1,0 +1,9 @@
+services:
+  app:
+    command: bin/orb-dev
+    port: 3000
+    health: /ready
+    portal:
+      title: Rails starter
+      description: Application and responsive UI review
+      review: true

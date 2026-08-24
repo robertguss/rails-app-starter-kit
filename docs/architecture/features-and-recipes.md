@@ -177,13 +177,13 @@ Unsupported combinations should fail generation with a clear explanation.
 
 ## Promotion rule
 
-| Discovery | Destination |
-|---|---|
-| Universal request-security fix | Foundation |
-| Needed by most bounded personal apps | Personal profile/capability |
-| Durable operation progress | Internal integrations capability |
-| Reusable import-preview workflow | Optional recipe |
-| Canvas rate-limit behavior | Canvas recipe |
-| Event Horizon mission progression | Event Horizon only |
+| Discovery                            | Destination                      |
+| ------------------------------------ | -------------------------------- |
+| Universal request-security fix       | Foundation                       |
+| Needed by most bounded personal apps | Personal profile/capability      |
+| Durable operation progress           | Internal integrations capability |
+| Reusable import-preview workflow     | Optional recipe                  |
+| Canvas rate-limit behavior           | Canvas recipe                    |
+| Event Horizon mission progression    | Event Horizon only               |
 
 The starter must not become the union of the validation applications.

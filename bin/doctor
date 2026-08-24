@@ -1,0 +1,46 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "open3"
+require "json"
+
+ROOT = File.expand_path("..", __dir__)
+SETUP_MODE = ARGV.delete("--setup")
+CHECK_MODE = ARGV.delete("--check")
+abort "Usage: bin/doctor [--setup|--check]" unless ARGV.empty?
+
+checks = {
+  "Ruby #{File.read(File.join(ROOT, ".ruby-version")).strip.sub("ruby-", "")}" => [ "ruby", "--version" ],
+  "Node.js #{File.read(File.join(ROOT, ".node-version")).strip}" => [ "node", "--version" ],
+  "pnpm #{JSON.parse(File.read(File.join(ROOT, "package.json"))).fetch("packageManager").split("@").last}" => [ "pnpm", "--version" ],
+  "PostgreSQL" => [ "pg_isready", "--quiet" ]
+}
+
+failures = checks.filter_map do |label, command|
+  _output, status = Open3.capture2e(*command, chdir: ROOT)
+  puts "ok      #{label}" if status.success?
+  label unless status.success?
+rescue Errno::ENOENT
+  label
+end
+
+required_names = if ENV.fetch("RAILS_ENV", "development") == "production"
+  %w[APP_HOST DATABASE_URL SECRET_KEY_BASE]
+else
+  []
+end
+missing_names = required_names.reject { |name| ENV[name].to_s.strip != "" }
+
+unless missing_names.empty?
+  warn "missing #{missing_names.join(", ")}"
+  failures << "required environment"
+end
+
+if failures.empty?
+  puts "Environment is ready"
+  exit
+end
+
+warn "Environment is not ready: #{failures.join(", ")}"
+warn "Run .agents/setup in an Amp Orb." if SETUP_MODE || CHECK_MODE
+exit 1

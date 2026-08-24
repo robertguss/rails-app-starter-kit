@@ -1,4 +1,6 @@
 require_relative "boot"
+require_relative "../lib/json_log_formatter"
+require_relative "../lib/request_context"
 
 require "rails"
 # Pick the frameworks you want:
@@ -24,6 +26,7 @@ module RailsAppStarterKit
 
     config.autoload_lib(ignore: %w[assets tasks])
     config.exceptions_app = routes
+    config.middleware.insert_after ActionDispatch::RequestId, RequestContext
 
     # File workflows and image processing are configured in Phase 4.
     config.active_storage.variant_processor = :disabled

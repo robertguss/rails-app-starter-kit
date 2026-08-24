@@ -1,0 +1,3 @@
+web: bin/rails server --binding ${RAILS_BINDING:-0.0.0.0}
+assets: pnpm exec vite build --watch
+worker: bin/jobs

@@ -1,7 +1,20 @@
 class ApplicationJob < ActiveJob::Base
-  # Automatically retry jobs that encountered a deadlock
-  # retry_on ActiveRecord::Deadlocked
+  around_perform do |job, block|
+    Current.job_id = job.job_id
+    Current.request_id = job.correlation_id
+    block.call
+  ensure
+    Current.reset
+  end
 
-  # Most jobs are safe to ignore if the underlying records are no longer available
-  # discard_on ActiveJob::DeserializationError
+  attr_reader :correlation_id
+
+  def serialize
+    super.merge("correlation_id" => Current.request_id)
+  end
+
+  def deserialize(job_data)
+    super
+    @correlation_id = job_data["correlation_id"]
+  end
 end

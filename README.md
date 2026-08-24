@@ -3,8 +3,9 @@
 Provider-independent Rails application starter aimed at small internal tools and
 personal or family applications.
 
-The project now contains the reviewed **Phase 1 Rails/Inertia foundation**.
-Later phases remain unimplemented and require separate authorization.
+The project now contains the reviewed Rails/Inertia foundation and deterministic
+developer, CI, and Amp Orb workflow. Authorized implementation of the remaining
+baseline phases is in progress.
 
 ## Why this project exists
 
@@ -32,15 +33,12 @@ Runtime and package versions, authoritative sources, architecture notes, and
 database conventions are recorded in the
 [Phase 1 implementation record](docs/implementation/phase-1.md).
 
-Phase 2 will establish the canonical `bin/setup`, `bin/dev`, and `bin/check`
-workflow. Until then, after installing the pinned runtimes and PostgreSQL:
+After installing the pinned runtimes and PostgreSQL:
 
 ```text
-bundle install
-pnpm install --frozen-lockfile
-bin/rails db:prepare
-bin/rails server            # terminal 1
-bin/vite dev                # terminal 2
+bin/setup
+bin/dev
+bin/check
 ```
 
 ## Start here
@@ -73,8 +71,8 @@ will be copied into the starter.
 
 - Documentation baseline: foundational and cross-cutting implementation defaults
   accepted
-- Application implementation: Phase 1 runnable Rails/Inertia foundation
-- Implementation authorization: Phase 1 granted; Phase 2 and later not granted
+- Application implementation: Phases 1–2 complete; Phases 3–7 in progress
+- Implementation authorization: Phases 1–7 granted
 - GitHub repository: private repository created at
   <https://github.com/robertguss/rails-app-starter-kit>
 

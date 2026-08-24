@@ -4,6 +4,16 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
+if ! bundle check >/dev/null 2>&1; then
+  echo "Ruby dependencies are incomplete; run .agents/setup" >&2
+  exit 1
+fi
+
+if ! pnpm install --frozen-lockfile --offline >/dev/null 2>&1; then
+  echo "JavaScript dependencies are incomplete; run .agents/setup" >&2
+  exit 1
+fi
+
 if ! pg_isready --quiet; then
   postgres_version="$(pg_lsclusters --no-header | awk 'NR == 1 { print $1 }')"
   sudo pg_ctlcluster "$postgres_version" main start
@@ -14,7 +24,7 @@ if ! sudo -u postgres psql --no-psqlrc --tuples-only --no-align \
   sudo -u postgres createuser --superuser "$USER"
 fi
 
-bin/rails db:prepare >/dev/null
+bin/rails db:prepare db:seed >/dev/null
 RAILS_ENV=test bin/rails db:prepare >/dev/null
 
-echo "PostgreSQL and Rails databases are ready"
+echo "Dependencies, PostgreSQL, and Rails databases are ready"

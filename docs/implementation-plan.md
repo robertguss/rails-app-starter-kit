@@ -1,6 +1,6 @@
 # Baseline Starter-Kit Implementation Plan
 
-Status: Phase 1 implemented; Phases 2–7 require Robert's approval
+Status: Phases 1–2 implemented; Phases 3–7 authorized and in progress
 
 Last updated: 2026-08-24
 
@@ -67,6 +67,9 @@ Status: implemented on 2026-08-24. See the
 - No provider-specific code or configuration exists.
 
 ## Phase 2 — Deterministic developer and agent workflow
+
+Status: implemented on 2026-08-24. See the
+[Phase 2 implementation record](implementation/phase-2.md).
 
 ### Work
 

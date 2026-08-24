@@ -78,18 +78,18 @@ production readiness.
 
 ## Lessons adapted rather than copied
 
-| Canopy choice | Starter adaptation |
-|---|---|
-| pnpm workspace | pnpm for frontend assets; no workspace without a second real package |
-| React Router Data Mode | Inertia visits and Rails controllers |
-| TanStack Query | Optional for independent polling/caching, not ordinary page state |
-| Zustand | Optional for complex cross-component UI state |
-| Fastify API | Rails controllers and domain workflows |
-| OpenAPI generated client | Deferred until a real non-Inertia client or public API exists |
-| Drizzle | Active Record and Rails migrations |
-| pg-boss | Solid Queue |
-| Separate static web/API | One Rails web application plus worker |
-| Workspace authorization | Simple app access grants; app-specific roles only when needed |
+| Canopy choice            | Starter adaptation                                                   |
+| ------------------------ | -------------------------------------------------------------------- |
+| pnpm workspace           | pnpm for frontend assets; no workspace without a second real package |
+| React Router Data Mode   | Inertia visits and Rails controllers                                 |
+| TanStack Query           | Optional for independent polling/caching, not ordinary page state    |
+| Zustand                  | Optional for complex cross-component UI state                        |
+| Fastify API              | Rails controllers and domain workflows                               |
+| OpenAPI generated client | Deferred until a real non-Inertia client or public API exists        |
+| Drizzle                  | Active Record and Rails migrations                                   |
+| pg-boss                  | Solid Queue                                                          |
+| Separate static web/API  | One Rails web application plus worker                                |
+| Workspace authorization  | Simple app access grants; app-specific roles only when needed        |
 
 ## Lessons not promoted automatically
 

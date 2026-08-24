@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+echo "==> Checking prerequisites"
+bin/doctor --setup
+
+echo "==> Installing locked Ruby dependencies"
+bundle check >/dev/null 2>&1 || bundle install
+
+echo "==> Installing locked JavaScript dependencies"
+pnpm install --frozen-lockfile
+
+echo "==> Preparing development and test databases"
+bin/rails db:prepare db:seed
+RAILS_ENV=test bin/rails db:prepare
+
+echo "==> Installing Playwright Chromium"
+pnpm exec playwright install chromium
+
+echo "Setup complete"

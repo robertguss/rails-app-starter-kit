@@ -12,7 +12,13 @@ import type { FormEvent } from "react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -33,10 +39,26 @@ interface RoundTripForm {
 }
 
 const foundationStates = [
-  { href: "/states/empty", label: "Empty", description: "A quiet starting point with one clear action." },
-  { href: "/states/loading", label: "Loading", description: "Stable skeletons with an accessible busy state." },
-  { href: "/health", label: "Health", description: "Human-readable application and database status." },
-  { href: "/missing-page", label: "404", description: "An Inertia response inside the same application shell." },
+  {
+    href: "/states/empty",
+    label: "Empty",
+    description: "A quiet starting point with one clear action.",
+  },
+  {
+    href: "/states/loading",
+    label: "Loading",
+    description: "Stable skeletons with an accessible busy state.",
+  },
+  {
+    href: "/health",
+    label: "Health",
+    description: "Human-readable application and database status.",
+  },
+  {
+    href: "/missing-page",
+    label: "404",
+    description: "An Inertia response inside the same application shell.",
+  },
 ]
 
 export default function HomePage({ flash, versions }: HomePageProps) {
@@ -66,8 +88,9 @@ export default function HomePage({ flash, versions }: HomePageProps) {
               A boring foundation for useful Rails applications.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-pretty text-muted-foreground">
-              Rails owns routing, validation, data, and HTTP. React supplies rich pages through Inertia, while
-              PostgreSQL keeps the durable center application-owned.
+              Rails owns routing, validation, data, and HTTP. React supplies
+              rich pages through Inertia, while PostgreSQL keeps the durable
+              center application-owned.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild>
@@ -89,7 +112,8 @@ export default function HomePage({ flash, versions }: HomePageProps) {
               </div>
               <CardTitle>Try the Inertia round trip</CardTitle>
               <CardDescription>
-                Submit a message. Rails validates it and redirects with errors or a flash response.
+                Submit a message. Rails validates it and redirects with errors
+                or a flash response.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -107,21 +131,37 @@ export default function HomePage({ flash, versions }: HomePageProps) {
                     id="round-trip-message"
                     name="message"
                     value={form.data.message}
-                    onChange={(event) => form.setData("message", event.target.value)}
+                    onChange={(event) =>
+                      form.setData("message", event.target.value)
+                    }
                     placeholder="Rails and React, without a separate API"
                     maxLength={120}
                     aria-invalid={Boolean(form.errors.message)}
-                    aria-describedby={form.errors.message ? "round-trip-message-error" : undefined}
+                    aria-describedby={
+                      form.errors.message
+                        ? "round-trip-message-error"
+                        : undefined
+                    }
                   />
                   {form.errors.message ? (
-                    <p id="round-trip-message-error" className="text-sm text-destructive" role="alert">
+                    <p
+                      id="round-trip-message-error"
+                      className="text-sm text-destructive"
+                      role="alert"
+                    >
                       {form.errors.message}
                     </p>
                   ) : (
-                    <p className="text-xs text-muted-foreground">Server validation is the source of truth.</p>
+                    <p className="text-xs text-muted-foreground">
+                      Server validation is the source of truth.
+                    </p>
                   )}
                 </div>
-                <Button type="submit" disabled={form.processing} className="w-full sm:w-auto">
+                <Button
+                  type="submit"
+                  disabled={form.processing}
+                  className="w-full sm:w-auto"
+                >
                   {form.processing ? "Sending…" : "Send through Rails"}
                 </Button>
               </form>
@@ -129,10 +169,18 @@ export default function HomePage({ flash, versions }: HomePageProps) {
           </Card>
         </section>
 
-        <section className="mt-16 border-t pt-12 sm:mt-20 sm:pt-16" aria-labelledby="stack-heading">
+        <section
+          className="mt-16 border-t pt-12 sm:mt-20 sm:pt-16"
+          aria-labelledby="stack-heading"
+        >
           <div className="max-w-2xl">
-            <p className="text-sm font-medium text-muted-foreground">One deployable application</p>
-            <h2 id="stack-heading" className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+            <p className="text-sm font-medium text-muted-foreground">
+              One deployable application
+            </p>
+            <h2
+              id="stack-heading"
+              className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl"
+            >
               Clear ownership at every layer
             </h2>
           </div>
@@ -158,13 +206,19 @@ export default function HomePage({ flash, versions }: HomePageProps) {
         <section className="mt-16 sm:mt-20" aria-labelledby="states-heading">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Representative UI</p>
-              <h2 id="states-heading" className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+              <p className="text-sm font-medium text-muted-foreground">
+                Representative UI
+              </p>
+              <h2
+                id="states-heading"
+                className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl"
+              >
                 Foundation states
               </h2>
             </div>
             <p className="max-w-lg text-sm leading-6 text-muted-foreground">
-              Each state stays responsive, theme-aware, and inside the same accessible shell.
+              Each state stays responsive, theme-aware, and inside the same
+              accessible shell.
             </p>
           </div>
           <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -178,7 +232,9 @@ export default function HomePage({ flash, versions }: HomePageProps) {
                   <h3 className="font-semibold">{state.label}</h3>
                   <ArrowRightIcon className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                 </div>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{state.description}</p>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  {state.description}
+                </p>
               </Link>
             ))}
           </div>
@@ -200,7 +256,9 @@ function FoundationCard({
   return (
     <Card className="gap-4 shadow-none">
       <CardHeader>
-        <span className="mb-3 grid size-9 place-items-center rounded-md bg-muted text-foreground [&_svg]:size-4">{icon}</span>
+        <span className="mb-3 grid size-9 place-items-center rounded-md bg-muted text-foreground [&_svg]:size-4">
+          {icon}
+        </span>
         <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
       <CardContent>

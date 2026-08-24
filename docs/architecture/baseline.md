@@ -6,22 +6,22 @@ Last updated: 2026-08-24
 
 ## Stack
 
-| Layer | Baseline |
-|---|---|
-| Language/framework | Ruby on Rails modular monolith |
-| Browser UI | React 19 + TypeScript through Inertia Rails |
-| Asset development | Vite |
-| Styling | Tailwind CSS 4, shadcn/ui New York style, Neutral base, Radix, Lucide, CSS variables, dark mode |
-| Database | PostgreSQL |
-| Persistence | Active Record and Rails migrations |
-| Jobs | Active Job with Solid Queue |
-| Files | Active Storage |
-| Email | Action Mailer |
-| Ruby tests | Minitest |
-| Frontend tests | Vitest + React Testing Library |
-| Browser tests | Playwright |
-| Quality/security | RuboCop, Brakeman, dependency audits, TypeScript, ESLint/Prettier |
-| Packaging | One production OCI image; Bundler + pnpm lockfiles |
+| Layer              | Baseline                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| Language/framework | Ruby on Rails modular monolith                                                                  |
+| Browser UI         | React 19 + TypeScript through Inertia Rails                                                     |
+| Asset development  | Vite                                                                                            |
+| Styling            | Tailwind CSS 4, shadcn/ui New York style, Neutral base, Radix, Lucide, CSS variables, dark mode |
+| Database           | PostgreSQL                                                                                      |
+| Persistence        | Active Record and Rails migrations                                                              |
+| Jobs               | Active Job with Solid Queue                                                                     |
+| Files              | Active Storage                                                                                  |
+| Email              | Action Mailer                                                                                   |
+| Ruby tests         | Minitest                                                                                        |
+| Frontend tests     | Vitest + React Testing Library                                                                  |
+| Browser tests      | Playwright                                                                                      |
+| Quality/security   | RuboCop, Brakeman, dependency audits, TypeScript, ESLint/Prettier                               |
+| Packaging          | One production OCI image; Bundler + pnpm lockfiles                                              |
 
 Exact stable versions must be checked from authoritative sources when
 implementation starts rather than pinned from this design document.

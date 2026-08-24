@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+: "${PORT:?Amp must provide PORT}"
+export RAILS_BINDING="0.0.0.0"
+
+bin/rails db:prepare db:seed
+bin/vite build
+exec bundle exec foreman start -f Procfile.orb -p "$PORT"

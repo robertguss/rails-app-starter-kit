@@ -67,5 +67,16 @@ class FoundationFlowTest < ActionDispatch::IntegrationTest
 
     get rails_health_check_path
     assert_response :success
+
+    get "/ready"
+    assert_response :success
+    assert_equal({ "status" => "ready", "checks" => { "database" => "ready" } }, response.parsed_body)
+  end
+
+  test "assigns and returns a request correlation identifier" do
+    get root_path, headers: { "X-Request-ID" => "request-123" }
+
+    assert_response :success
+    assert_equal "request-123", response.headers["X-Request-ID"]
   end
 end

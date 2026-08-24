@@ -4,14 +4,18 @@ import { StrictMode, type ReactNode } from "react"
 import { createRoot } from "react-dom/client"
 
 import { AppShell } from "@/components/app-shell"
+import { ErrorBoundary } from "@/components/error-boundary"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import type { SharedPageProps } from "@/types/page"
 import "@/styles/application.css"
 
-const pages = import.meta.glob<{ default: ResolvedComponent }>("../pages/**/*.tsx")
+const pages = import.meta.glob<{ default: ResolvedComponent }>(
+  "../pages/**/*.tsx",
+)
 
 createInertiaApp<SharedPageProps>({
-  title: (title) => (title ? `${title} · Rails Starter` : "Rails App Starter Kit"),
+  title: (title) =>
+    title ? `${title} · Rails Starter` : "Rails App Starter Kit",
   resolve: async (name) => {
     const page = pages[`../pages/${name}.tsx`]
 
@@ -27,17 +31,19 @@ createInertiaApp<SharedPageProps>({
   setup({ el, App, props }) {
     createRoot(el).render(
       <StrictMode>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          storageKey="rails-starter-theme"
-        >
-          <TooltipProvider>
-            <App {...props} />
-          </TooltipProvider>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            storageKey="rails-starter-theme"
+          >
+            <TooltipProvider>
+              <App {...props} />
+            </TooltipProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
       </StrictMode>,
     )
   },
