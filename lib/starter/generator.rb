@@ -149,12 +149,45 @@ module Starter
           text = path.read
           text.sub!(/AUTH_METHODS: \$\{AUTH_METHODS:-(?:none|password|google)\}/, "AUTH_METHODS: ${AUTH_METHODS:-#{auth}}")
           text.sub!(/^AUTH_METHODS=(?:none|password|google)$/, "AUTH_METHODS=#{auth}")
-          if relative == ".env.example" && auth == "google"
-            text.sub!("AUTH_METHODS=google\n", "AUTH_METHODS=google\nGOOGLE_WORKSPACE_DOMAINS=example.com\n")
-            text.sub!("SECRET_KEY_BASE=\n", "SECRET_KEY_BASE=\nGOOGLE_CLIENT_ID=\nGOOGLE_CLIENT_SECRET=\n")
+          if auth == "google"
+            case relative
+            when ".env.example"
+              text.sub!("AUTH_METHODS=google\n", "AUTH_METHODS=google\nGOOGLE_WORKSPACE_DOMAINS=example.com\n")
+              text.sub!("SECRET_KEY_BASE=\n", "SECRET_KEY_BASE=\nGOOGLE_CLIENT_ID=\nGOOGLE_CLIENT_SECRET=\n")
+            when "compose.yaml"
+              text.sub!(
+                "    AUTH_METHODS: ${AUTH_METHODS:-google}\n",
+                "    AUTH_METHODS: ${AUTH_METHODS:-google}\n" \
+                  "    GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?set GOOGLE_CLIENT_ID}\n" \
+                  "    GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?set GOOGLE_CLIENT_SECRET}\n" \
+                  "    GOOGLE_WORKSPACE_DOMAINS: ${GOOGLE_WORKSPACE_DOMAINS:?set GOOGLE_WORKSPACE_DOMAINS}\n"
+              )
+            when "compose.env.example"
+              text.sub!(
+                "AUTH_METHODS=google\n",
+                "AUTH_METHODS=google\n" \
+                  "GOOGLE_CLIENT_ID=replace-with-google-client-id\n" \
+                  "GOOGLE_CLIENT_SECRET=replace-with-google-client-secret\n" \
+                  "GOOGLE_WORKSPACE_DOMAINS=example.com\n"
+              )
+            end
           end
           path.write(text)
         end
+
+        return unless auth == "google"
+
+        render = destination.join("render.yaml")
+        text = render.read
+        text.sub!(
+          "      - key: SECRET_KEY_BASE\n        sync: false\n",
+          "      - key: SECRET_KEY_BASE\n        sync: false\n" \
+            "      - key: AUTH_METHODS\n        value: google\n" \
+            "      - key: GOOGLE_CLIENT_ID\n        sync: false\n" \
+            "      - key: GOOGLE_CLIENT_SECRET\n        sync: false\n" \
+            "      - key: GOOGLE_WORKSPACE_DOMAINS\n        sync: false\n"
+        )
+        render.write(text)
       end
 
       def rename_application(destination, name)

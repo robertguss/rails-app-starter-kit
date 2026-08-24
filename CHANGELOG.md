@@ -5,6 +5,12 @@
 - Generated profiles now carry their selected authentication method into the
   Compose examples and consistently rename Compose, PostgreSQL, Render, MinIO,
   and Orb service identities instead of retaining starter-owned names.
+- Generated internal profiles now forward their required workspace
+  authentication settings through Compose and declare them in the Render
+  example.
+- The production image now uses a BuildKit-compatible named Node build stage and
+  creates ignored runtime directories before assigning ownership, so a clean
+  generated checkout builds successfully.
 - `bin/check` now resets the test database before Ruby tests so durable records
   created by browser tests cannot make a subsequent check fail.
 

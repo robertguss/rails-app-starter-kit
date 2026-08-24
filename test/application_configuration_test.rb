@@ -16,8 +16,12 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
     assert_includes Rails.root.join("db/structure.sql").read, "CREATE TABLE public.solid_queue_jobs"
 
     dockerfile = Rails.root.join("Dockerfile").read
+    assert_includes dockerfile, "FROM docker.io/library/node:${NODE_VERSION}-bookworm-slim AS node"
+    assert_includes dockerfile, "COPY --from=node /usr/local/ /usr/local/"
+    refute_match(/COPY --from=\S*\$\{/, dockerfile)
     runtime_stage = dockerfile.split(/^FROM base$/, -1).last
     assert_includes runtime_stage, 'ENTRYPOINT ["/rails/bin/docker-entrypoint"]'
+    assert_includes runtime_stage, "mkdir -p db log storage tmp"
     refute_match(/node|pnpm/i, runtime_stage)
 
     compose = Rails.root.join("compose.yaml").read

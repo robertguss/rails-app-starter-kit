@@ -116,6 +116,15 @@ class StarterGeneratorTest < ActiveSupport::TestCase
         assert_includes environment, "GOOGLE_WORKSPACE_DOMAINS=example.com"
         assert_includes environment, "GOOGLE_CLIENT_ID="
         assert_includes environment, "GOOGLE_CLIENT_SECRET="
+        assert_includes compose, "GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?set GOOGLE_CLIENT_ID}"
+        assert_includes compose, "GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?set GOOGLE_CLIENT_SECRET}"
+        assert_includes compose, "GOOGLE_WORKSPACE_DOMAINS: ${GOOGLE_WORKSPACE_DOMAINS:?set GOOGLE_WORKSPACE_DOMAINS}"
+        assert_includes compose_environment, "GOOGLE_CLIENT_ID=replace-with-google-client-id"
+        assert_includes compose_environment, "GOOGLE_CLIENT_SECRET=replace-with-google-client-secret"
+        assert_includes compose_environment, "GOOGLE_WORKSPACE_DOMAINS=example.com"
+        assert_includes render, "key: GOOGLE_CLIENT_ID"
+        assert_includes render, "key: GOOGLE_CLIENT_SECRET"
+        assert_includes render, "key: GOOGLE_WORKSPACE_DOMAINS"
       end
     end
 
