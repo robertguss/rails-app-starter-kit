@@ -25,5 +25,6 @@ Rails.application.routes.draw do
 
   match "/404", to: "errors#not_found", via: :all
   match "/500", to: "errors#internal_server_error", via: :all
-  match "*path", to: "errors#not_found", via: :all
+  match "*path", to: "errors#not_found", via: :all,
+    constraints: ->(request) { !request.path.start_with?(ActiveStorage.routes_prefix) }
 end
