@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test"
 
+test.beforeEach(async ({ page }) => {
+  const response = await page.request.post("/agent/login", {
+    form: { user: "owner" },
+  })
+  expect(response.ok()).toBe(true)
+})
+
 test("Inertia navigation and Rails form validation complete without a full-page API layer", async ({
   page,
 }) => {

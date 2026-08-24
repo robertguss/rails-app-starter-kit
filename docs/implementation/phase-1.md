@@ -129,9 +129,10 @@ The foundation deliberately has no product tables. Future migrations must:
 - use normal Rails migrations and run `db:prepare` once in a later release role,
   never automatically in every web or worker process.
 
-The default Rails schema format remains sufficient for these initial
-constraints. Move to `structure.sql` only when an adopted PostgreSQL feature
-cannot be represented faithfully, rather than imposing it speculatively.
+Phase 1 used the default Rails schema format. Phase 3 deliberately moved the
+primary database to `structure.sql` when the exactly-one-usable-owner invariant
+adopted a deferred PostgreSQL constraint trigger that `schema.rb` cannot
+represent faithfully. The Solid Queue schema remains a Ruby schema dump.
 
 ## Direct Phase 1 verification
 

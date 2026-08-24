@@ -1,6 +1,13 @@
 require "test_helper"
 
 class FoundationFlowTest < ActionDispatch::IntegrationTest
+  setup do
+    [ AuditEvent, PasswordRecovery, Invitation, Session, Identity, AccessGrant, User ].each(&:delete_all)
+    owner = User.create!(email_address: "owner@example.test", name: "Owner", password: "long-password", role: :owner)
+    AccessGrant.create!(normalized_email: owner.email_address, granted_by: owner, granted_at: Time.current, claimed_by: owner, claimed_at: Time.current)
+    post login_path, params: { email_address: owner.email_address, password: "long-password" }
+  end
+
   test "renders the foundation through Inertia" do
     get root_path
 

@@ -107,6 +107,9 @@ Status: implemented on 2026-08-24. See the
 
 ## Phase 3 — First-party authentication and closed access
 
+Status: implemented on 2026-08-24. See the
+[Phase 3 implementation record](implementation/phase-3.md).
+
 ### Work
 
 1. Apply Rails-generated authentication and inspect all generated behavior.

@@ -9,7 +9,8 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "RAILS_ENV=test bin/rails server --binding 127.0.0.1 --port 3101",
+    command:
+      "RAILS_ENV=test AGENT_LOGIN_ENABLED=1 bin/rails db:seed && RAILS_ENV=test AGENT_LOGIN_ENABLED=1 bin/rails server --binding 127.0.0.1 --port 3101",
     url: "http://127.0.0.1:3101/up",
     reuseExistingServer: false,
     timeout: 120_000,

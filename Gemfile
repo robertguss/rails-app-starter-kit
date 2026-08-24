@@ -3,8 +3,12 @@ source "https://rubygems.org"
 ruby "4.0.6"
 
 gem "bootsnap", "1.25.0", require: false
+gem "bcrypt", "3.1.22"
 gem "dotenv-rails", "3.2.0", groups: [ :development, :test ]
 gem "inertia_rails", "3.22.0"
+gem "omniauth", "2.1.4"
+gem "omniauth-google-oauth2", "1.2.2"
+gem "omniauth-rails_csrf_protection", "2.0.1"
 gem "pg", "1.6.3"
 gem "puma", "8.0.2"
 gem "rails", "8.1.3.1"

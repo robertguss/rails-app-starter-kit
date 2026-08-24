@@ -5,11 +5,10 @@ application starter kit.
 
 ## Current phase
 
-Robert explicitly authorized and the repository now contains **Phase 1: the
-runnable Rails/Inertia foundation**. Phase 2 and later functionality remains
-unauthorized. Do not add deterministic workflow infrastructure, authentication,
-operational capabilities, profiles/recipes, integrations, deployment, or other
-later-phase behavior without Robert's explicit approval for that phase.
+Phases 1–3 are implemented; Phases 4–7 are authorized. Authentication remains
+closed-access: never store raw auth tokens, bypass active grants, weaken the
+single-owner database/application safeguards, or expose agent login outside
+development and explicit non-production browser-test mode.
 
 Robert accepted the foundational preimplementation decisions and cross-cutting
 implementation defaults recorded in `docs/decision-register.md` on 2026-08-24.
@@ -73,7 +72,7 @@ repository private until Robert has reviewed what may be published.
 
 ## Verification interface
 
-Phase 2 will establish these standard commands:
+Use these standard commands:
 
 ```text
 bin/setup       # idempotent fresh-clone setup
@@ -81,7 +80,3 @@ bin/dev         # local development
 bin/check       # complete deterministic verification
 bin/orb-dev     # Amp Orb service entrypoint
 ```
-
-Until Phase 2 is authorized and implemented, use the direct Phase 1 commands in
-`docs/implementation/phase-1.md` and do not claim this canonical interface
-exists.

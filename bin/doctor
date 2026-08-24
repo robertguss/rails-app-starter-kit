@@ -25,7 +25,9 @@ rescue Errno::ENOENT
 end
 
 required_names = if ENV.fetch("RAILS_ENV", "development") == "production"
-  %w[APP_HOST DATABASE_URL SECRET_KEY_BASE]
+  names = %w[APP_HOST DATABASE_URL SECRET_KEY_BASE AUTH_METHODS]
+  names.concat(%w[GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET GOOGLE_WORKSPACE_DOMAINS]) if ENV.fetch("AUTH_METHODS", "").split(",").include?("google")
+  names
 else
   []
 end
@@ -34,6 +36,13 @@ missing_names = required_names.reject { |name| ENV[name].to_s.strip != "" }
 unless missing_names.empty?
   warn "missing #{missing_names.join(", ")}"
   failures << "required environment"
+end
+
+auth_methods = ENV.fetch("AUTH_METHODS", "password").split(",").map(&:strip).reject(&:empty?)
+unknown_auth_methods = auth_methods - %w[google password]
+if auth_methods.empty? || unknown_auth_methods.any?
+  warn "AUTH_METHODS must contain only: google, password"
+  failures << "authentication methods"
 end
 
 if failures.empty?

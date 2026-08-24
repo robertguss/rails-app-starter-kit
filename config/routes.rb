@@ -8,6 +8,21 @@ Rails.application.routes.draw do
 
   resources :round_trip_messages, only: :create
 
+  get "login" => "sessions#new"
+  post "login" => "sessions#create"
+  delete "logout" => "sessions#destroy"
+  get "invitations/:token" => "invitations#show", as: :invitation
+  patch "invitations/:token" => "invitations#update"
+  resource :password_recovery, only: %i[new create update]
+  get "password_recovery/:token" => "password_recoveries#edit", as: :edit_password_recovery
+  get "/auth/google_oauth2/callback" => "omniauth_callbacks#google"
+  get "/auth/failure" => "omniauth_callbacks#failure"
+  post "agent/login" => "agent_sessions#create"
+  get "settings/access" => "settings/access#index", as: :settings_access
+  post "settings/access" => "settings/access#create"
+  delete "settings/access/:id" => "settings/access#destroy"
+  post "settings/access/:id/transfer" => "settings/access#transfer"
+
   root "home#show"
 
   match "/404", to: "errors#not_found", via: :all
