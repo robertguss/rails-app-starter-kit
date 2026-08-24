@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+started_at=$SECONDS
+
+step() {
+  printf '\n==> %s\n' "$1"
+}
+
+step "Installing required system packages"
+system_packages=(
+  autoconf
+  bison
+  build-essential
+  ca-certificates
+  curl
+  libdb-dev
+  libffi-dev
+  libgdbm-compat-dev
+  libgdbm-dev
+  libgmp-dev
+  libncurses-dev
+  libpq-dev
+  libreadline-dev
+  libssl-dev
+  libyaml-dev
+  pkg-config
+  postgresql
+  postgresql-contrib
+  xz-utils
+  zlib1g-dev
+)
+missing_packages=()
+
+for package in "${system_packages[@]}"; do
+  if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q '^install ok installed$'; then
+    missing_packages+=("$package")
+  fi
+done
+
+if ((${#missing_packages[@]})); then
+  sudo apt-get update
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${missing_packages[@]}"
+else
+  echo "System packages already installed"
+fi
+
+step "Installing Ruby"
+ruby_version="$(sed 's/^ruby-//' .ruby-version)"
+ruby_prefix="$HOME/.rubies/ruby-$ruby_version"
+ruby_archive="$HOME/.cache/ruby/ruby-$ruby_version.tar.gz"
+ruby_sha256="837d299e8f7ddf2be31a229a7a7e019d354979825117989acb3b32b1a9be262a"
+
+if [[ ! -x "$ruby_prefix/bin/ruby" ]] || ! "$ruby_prefix/bin/ruby" -e "exit RUBY_VERSION == '$ruby_version' ? 0 : 1"; then
+  mkdir -p "$(dirname "$ruby_archive")" "$HOME/.rubies"
+  curl --fail --location --retry 3 \
+    "https://cache.ruby-lang.org/pub/ruby/${ruby_version%.*}/ruby-$ruby_version.tar.gz" \
+    --output "$ruby_archive"
+  printf '%s  %s\n' "$ruby_sha256" "$ruby_archive" | sha256sum --check --status
+
+  ruby_source="$(mktemp -d)"
+  trap 'rm -rf "${ruby_source:-}"' EXIT
+  tar -xzf "$ruby_archive" --strip-components=1 -C "$ruby_source"
+  (
+    cd "$ruby_source"
+    ./configure --prefix="$ruby_prefix" --disable-install-doc
+    make -j"$(nproc)"
+    make install
+  )
+  rm -rf "$ruby_source"
+  ruby_source=""
+  trap - EXIT
+else
+  echo "Ruby $ruby_version already installed"
+fi
+
+mkdir -p "$HOME/.local/bin"
+for executable in ruby gem bundle bundler rake; do
+  ln -sfn "$ruby_prefix/bin/$executable" "$HOME/.local/bin/$executable"
+done
+
+step "Installing Node.js and pnpm"
+node_version="$(cat .node-version)"
+node_platform="linux-x64"
+node_directory="$HOME/.local/share/node-v$node_version-$node_platform"
+node_archive="$HOME/.cache/node/node-v$node_version-$node_platform.tar.xz"
+node_sha256="14b342e71204f811bde6153be8e04b62aef63c236fef92b55f9c83154b409647"
+
+if [[ ! -x "$node_directory/bin/node" ]] || [[ "$($node_directory/bin/node --version)" != "v$node_version" ]]; then
+  mkdir -p "$(dirname "$node_archive")" "$HOME/.local/share"
+  curl --fail --location --retry 3 \
+    "https://nodejs.org/dist/v$node_version/node-v$node_version-$node_platform.tar.xz" \
+    --output "$node_archive"
+  printf '%s  %s\n' "$node_sha256" "$node_archive" | sha256sum --check --status
+  tar -xJf "$node_archive" -C "$HOME/.local/share"
+else
+  echo "Node.js $node_version already installed"
+fi
+
+ln -sfn "$node_directory" "$HOME/.local/share/node"
+for executable in node npm npx corepack; do
+  ln -sfn "$HOME/.local/share/node/bin/$executable" "$HOME/.local/bin/$executable"
+done
+"$HOME/.local/bin/corepack" enable pnpm --install-directory "$HOME/.local/bin"
+
+step "Installing locked application dependencies"
+bundle config set --local path vendor/bundle
+bundle install --jobs "$(nproc)" --retry 3
+pnpm install --frozen-lockfile
+
+step "Installing Playwright Chromium"
+if ! pnpm exec playwright install-deps --dry-run chromium >/dev/null 2>&1; then
+  sudo env DEBIAN_FRONTEND=noninteractive pnpm exec playwright install-deps chromium
+fi
+pnpm exec playwright install chromium
+
+step "Tuning PostgreSQL for orb workloads"
+postgres_version="$(pg_lsclusters --no-header | awk 'NR == 1 { print $1 }')"
+postgres_tuning="$(mktemp)"
+cat >"$postgres_tuning" <<'EOF'
+# Amp orbs are disposable; favor test speed over crash durability.
+fsync = off
+synchronous_commit = off
+full_page_writes = off
+EOF
+
+postgres_tuning_target="/etc/postgresql/$postgres_version/main/conf.d/amp-orb.conf"
+if ! sudo cmp --silent "$postgres_tuning" "$postgres_tuning_target" 2>/dev/null; then
+  sudo install -m 0644 "$postgres_tuning" "$postgres_tuning_target"
+  sudo pg_ctlcluster "$postgres_version" main restart
+fi
+rm -f "$postgres_tuning"
+
+step "Preparing PostgreSQL and application databases"
+"$repo_root/.agents/resume"
+
+printf '\nSetup complete in %ss\n' "$((SECONDS - started_at))"

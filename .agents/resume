@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+if ! pg_isready --quiet; then
+  postgres_version="$(pg_lsclusters --no-header | awk 'NR == 1 { print $1 }')"
+  sudo pg_ctlcluster "$postgres_version" main start
+fi
+
+if ! sudo -u postgres psql --no-psqlrc --tuples-only --no-align \
+  --command "SELECT 1 FROM pg_roles WHERE rolname = '$USER'" | grep -qx 1; then
+  sudo -u postgres createuser --superuser "$USER"
+fi
+
+bin/rails db:prepare >/dev/null
+RAILS_ENV=test bin/rails db:prepare >/dev/null
+
+echo "PostgreSQL and Rails databases are ready"
