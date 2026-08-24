@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+backup_root="${BACKUP_ROOT:-tmp/backups}"
+retention_count="${BACKUP_RETENTION_COUNT:-14}"
+
+if [[ ! "$retention_count" =~ ^[0-9]+$ ]] || (( retention_count < 1 )); then
+  echo "BACKUP_RETENTION_COUNT must be a positive integer" >&2
+  exit 1
+fi
+if [[ ! -d "$backup_root" ]]; then
+  echo "No backup directory exists at $backup_root"
+  exit 0
+fi
+
+mapfile -t backups < <(find "$backup_root" -mindepth 1 -maxdepth 1 -type d -name '????????T??????Z' -printf '%f\n' | sort)
+remove_count=$(( ${#backups[@]} - retention_count ))
+
+if (( remove_count <= 0 )); then
+  echo "Nothing to prune; retaining ${#backups[@]} backup(s)"
+  exit 0
+fi
+
+for backup in "${backups[@]:0:remove_count}"; do
+  echo "Removing expired backup: $backup"
+  rm -rf -- "$backup_root/$backup"
+done

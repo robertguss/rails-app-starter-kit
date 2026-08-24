@@ -8,4 +8,24 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
     package = JSON.parse(Rails.root.join("package.json").read)
     assert_nil package.fetch("scripts")["ssr"]
   end
+
+  test "operational facilities share one database and one Node-free runtime image" do
+    database_configuration = Rails.root.join("config/database.yml").read
+    assert_equal 1, database_configuration.scan(/^production:/).size
+    refute_match(/queue_database|_queue_/, database_configuration)
+    assert_includes Rails.root.join("db/structure.sql").read, "CREATE TABLE public.solid_queue_jobs"
+
+    dockerfile = Rails.root.join("Dockerfile").read
+    runtime_stage = dockerfile.split(/^FROM base$/, -1).last
+    assert_includes runtime_stage, 'ENTRYPOINT ["/rails/bin/docker-entrypoint"]'
+    refute_match(/node|pnpm/i, runtime_stage)
+
+    compose = Rails.root.join("compose.yaml").read
+    assert_includes compose, "command: bin/release"
+    assert_includes compose, "command: bin/jobs start"
+
+    %w[backup backup-prune config-check docker-entrypoint release restore restore-drill worker-health].each do |script|
+      assert_predicate Rails.root.join("bin", script), :executable?
+    end
+  end
 end

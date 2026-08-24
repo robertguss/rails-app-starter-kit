@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+backup_dir="${1:?usage: bin/restore-drill PATH_TO_BACKUP}"
+source_url="${DATABASE_URL:?DATABASE_URL is required}"
+source_database="$(psql "$source_url" -XAtqc 'SELECT current_database()')"
+target_database="${source_database}_restore_${PPID}"
+
+readarray -t urls < <(ruby -ruri -e '
+  uri = URI(ARGV.fetch(0))
+  target = uri.dup
+  target.path = "/#{ARGV.fetch(1)}"
+  maintenance = uri.dup
+  maintenance.path = "/postgres"
+  puts target
+  puts maintenance
+' "$source_url" "$target_database")
+target_url="${urls[0]}"
+maintenance_url="${urls[1]}"
+storage_root="$(mktemp -d "${TMPDIR:-/tmp}/starter-restore-storage.XXXXXX")"
+
+cleanup() {
+  dropdb --if-exists --force --maintenance-db "$maintenance_url" "$target_database" >/dev/null
+  rm -rf "$storage_root"
+}
+trap cleanup EXIT
+
+createdb --maintenance-db "$maintenance_url" "$target_database"
+
+DATABASE_URL="$source_url" \
+RESTORE_DATABASE_URL="$target_url" \
+RESTORE_CONFIRM_DATABASE="$target_database" \
+RESTORE_STORAGE_ROOT="$storage_root" \
+RESTORE_CONFIRM_STORAGE_ROOT="$storage_root" \
+  bin/restore "$backup_dir"
+
+expected_migrations="$(psql "$source_url" -XAtqc 'SELECT count(*) FROM schema_migrations')"
+restored_migrations="$(psql "$target_url" -XAtqc 'SELECT count(*) FROM schema_migrations')"
+[[ "$expected_migrations" == "$restored_migrations" ]]
+
+for table in users solid_queue_jobs active_storage_blobs; do
+  restored_table="$(psql "$target_url" -XAtqc "SELECT to_regclass('public.${table}') IS NOT NULL")"
+  [[ "$restored_table" == "t" ]]
+done
+
+expected_storage_entries="$(tar --list --file "$backup_dir/storage.tar.gz" | wc -l)"
+restored_storage_entries="$(( $(find "$storage_root" -mindepth 1 | wc -l) + 1 ))"
+[[ "$expected_storage_entries" == "$restored_storage_entries" ]]
+
+echo "Restore drill passed for disposable database $target_database"

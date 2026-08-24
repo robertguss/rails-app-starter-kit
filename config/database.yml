@@ -10,37 +10,16 @@ default: &default
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
 
 development:
-  primary:
-    <<: *default
-    database: rails_app_starter_kit_development_<%= safe_suffix %>
-    schema_format: sql
-  queue:
-    <<: *default
-    database: rails_app_starter_kit_development_queue_<%= safe_suffix %>
-    migrations_paths: db/queue_migrate
-    schema_dump: queue_schema.rb
-    schema_format: ruby
+  <<: *default
+  database: rails_app_starter_kit_development_<%= safe_suffix %>
+  schema_format: sql
 
 test:
-  primary:
-    <<: *default
-    database: rails_app_starter_kit_test_<%= safe_suffix %>
-    schema_format: sql
-  queue:
-    <<: *default
-    database: rails_app_starter_kit_test_queue_<%= safe_suffix %>
-    migrations_paths: db/queue_migrate
-    schema_dump: queue_schema.rb
-    schema_format: ruby
+  <<: *default
+  database: rails_app_starter_kit_test_<%= safe_suffix %>
+  schema_format: sql
 
 production:
-  primary:
-    <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
-    schema_format: sql
-  queue:
-    <<: *default
-    url: <%= ENV["QUEUE_DATABASE_URL"] %>
-    migrations_paths: db/queue_migrate
-    schema_dump: queue_schema.rb
-    schema_format: ruby
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
+  schema_format: sql

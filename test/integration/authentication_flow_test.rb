@@ -84,6 +84,23 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     AgentSessionsController.environment_guard = previous
   end
 
+  test "granting access queues an invitation only when mail delivery is configured" do
+    previous = Rails.configuration.x.mail_delivery_enabled
+    post login_path, params: { email_address: @owner.email_address, password: "long-password" }
+
+    assert_enqueued_emails 1 do
+      post settings_access_path, params: { email: "invited@example.test" }
+    end
+    assert_equal 1, Invitation.count
+
+    Rails.configuration.x.mail_delivery_enabled = false
+    assert_no_enqueued_emails do
+      post settings_access_path, params: { email: "operator-delivered@example.test" }
+    end
+    assert_equal 1, Invitation.count
+  ensure
+    Rails.configuration.x.mail_delivery_enabled = previous unless previous.nil?
+  end
 
   private
     def with_auth_methods(methods)

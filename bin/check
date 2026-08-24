@@ -11,6 +11,7 @@ run() {
 }
 
 run "Environment" bin/doctor --check
+run "Shell syntax" bash -n .agents/resume .agents/setup bin/backup bin/backup-prune bin/check bin/dev bin/docker-entrypoint bin/doctor bin/orb-dev bin/release bin/restore bin/restore-drill bin/setup bin/worker-health
 run "Ruby style" bundle exec rubocop
 run "Frontend formatting" pnpm format:check
 run "Frontend lint" pnpm lint

@@ -1,0 +1,108 @@
+name: rails-app-starter
+
+x-app: &app
+  build: .
+  image: rails-app-starter:local
+  restart: unless-stopped
+  environment: &app-environment
+    ACTIVE_STORAGE_ROOT: /rails/storage
+    APP_HOST: ${APP_HOST:-localhost}
+    AUTH_METHODS: ${AUTH_METHODS:-password}
+    DATABASE_URL: postgresql://starter:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/starter_production
+    FORCE_SSL: ${FORCE_SSL:-0}
+    MAIL_DELIVERY_METHOD: ${MAIL_DELIVERY_METHOD:-none}
+    RAILS_LOG_LEVEL: ${RAILS_LOG_LEVEL:-info}
+    SECRET_KEY_BASE: ${SECRET_KEY_BASE:?set SECRET_KEY_BASE}
+    STORAGE_SERVICE: ${STORAGE_SERVICE:-local}
+  volumes:
+    - storage:/rails/storage
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:15.19-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: starter_production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_USER: starter
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U starter -d starter_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  release:
+    <<: *app
+    restart: "no"
+    command: bin/release
+
+  web:
+    <<: *app
+    command: bin/rails server --binding 0.0.0.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      release:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:3000/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    ports:
+      - "${PORT:-3000}:3000"
+
+  worker:
+    <<: *app
+    command: bin/jobs start
+    depends_on:
+      postgres:
+        condition: service_healthy
+      release:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "bin/worker-health"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+
+  mailpit:
+    image: axllent/mailpit:v1.30.7
+    profiles: [development]
+    ports:
+      - "8025:8025"
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    profiles: [s3-test]
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-starter-minio-secret}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-starter-minio}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "--silent",
+          "http://localhost:9000/minio/health/live",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio:/data
+
+volumes:
+  minio:
+  postgres:
+  storage:

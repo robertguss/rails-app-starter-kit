@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :identities, dependent: :destroy
   has_many :password_recoveries, dependent: :destroy
+  has_many_attached :uploads
   has_one :access_grant, foreign_key: :claimed_by_id, inverse_of: :claimed_by, dependent: :restrict_with_error
 
   normalizes :email_address, with: ->(email) { email.strip.downcase }

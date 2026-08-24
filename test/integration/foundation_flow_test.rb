@@ -77,7 +77,10 @@ class FoundationFlowTest < ActionDispatch::IntegrationTest
 
     get "/ready"
     assert_response :success
-    assert_equal({ "status" => "ready", "checks" => { "database" => "ready" } }, response.parsed_body)
+    assert_equal({
+      "status" => "ready",
+      "checks" => { "database" => "ready", "migrations" => "ready", "queue" => "ready" }
+    }, response.parsed_body)
   end
 
   test "assigns and returns a request correlation identifier" do

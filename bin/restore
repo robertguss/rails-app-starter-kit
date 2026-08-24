@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+backup_dir="${1:?usage: bin/restore PATH_TO_BACKUP}"
+target_url="${RESTORE_DATABASE_URL:?RESTORE_DATABASE_URL is required}"
+storage_root="${RESTORE_STORAGE_ROOT:?RESTORE_STORAGE_ROOT is required}"
+confirm_storage_root="${RESTORE_CONFIRM_STORAGE_ROOT:?RESTORE_CONFIRM_STORAGE_ROOT is required}"
+
+for file in manifest SHA256SUMS database.dump storage.tar.gz; do
+  if [[ ! -f "$backup_dir/$file" ]]; then
+    echo "Backup is incomplete; missing $file" >&2
+    exit 1
+  fi
+done
+
+(
+  cd "$backup_dir"
+  sha256sum --check SHA256SUMS
+)
+
+target_database="$(psql "$target_url" -XAtqc 'SELECT current_database()')"
+if [[ "${RESTORE_CONFIRM_DATABASE:-}" != "$target_database" ]]; then
+  echo "Set RESTORE_CONFIRM_DATABASE=$target_database to acknowledge destructive database replacement" >&2
+  exit 1
+fi
+if [[ "$storage_root" == "/" || "$storage_root" != "$confirm_storage_root" ]]; then
+  echo "RESTORE_CONFIRM_STORAGE_ROOT must exactly match the non-root restore path" >&2
+  exit 1
+fi
+if [[ -n "${DATABASE_URL:-}" && "$target_url" == "$DATABASE_URL" ]]; then
+  echo "Refusing to restore over DATABASE_URL; provide a distinct restore target" >&2
+  exit 1
+fi
+
+if tar --list --file "$backup_dir/storage.tar.gz" | grep -Eq '(^/|(^|/)\.\.(/|$))'; then
+  echo "Storage archive contains an unsafe path" >&2
+  exit 1
+fi
+
+echo "==> Replacing PostgreSQL database $target_database"
+pg_restore \
+  --dbname "$target_url" \
+  --clean \
+  --if-exists \
+  --no-owner \
+  --no-privileges \
+  --exit-on-error \
+  "$backup_dir/database.dump"
+
+echo "==> Replacing local Active Storage at $storage_root"
+mkdir -p "$storage_root"
+find "$storage_root" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+tar --extract --gzip --file "$backup_dir/storage.tar.gz" --directory "$storage_root"
+
+echo "Restore complete"

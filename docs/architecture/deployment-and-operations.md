@@ -1,6 +1,6 @@
 # Deployment and Operations
 
-Status: accepted direction; scripts not implemented
+Status: operational foundation implemented; host recipes implemented in Phase 7
 
 Last updated: 2026-08-24
 
@@ -17,7 +17,7 @@ release:  bin/rails db:prepare
 Do not build host-specific application layers. Host files supply process,
 network, volume, secret, and health configuration only.
 
-## Planned repository artifacts
+## Repository artifacts
 
 ```text
 Dockerfile
@@ -37,7 +37,9 @@ docs/deployment/
   backups.md
 ```
 
-Do not create these until implementation is approved.
+The shared image, Compose topology, entrypoint, release command, backup tools,
+and operator runbook are implemented. Phase 7 owns the thin host-specific files
+and deployment guides.
 
 ## Compose topology
 
@@ -51,8 +53,8 @@ public HTTPS proxy -> web
                 worker        PostgreSQL
 ```
 
-Only the web port is public. PostgreSQL must not bind to a public interface.
-The worker uses the same image and environment as web with a different command.
+Only the web port is public. PostgreSQL must not bind to a public interface. The
+worker uses the same image and environment as web with a different command.
 
 ## Data and storage
 
@@ -109,8 +111,8 @@ A backup that has never been restored is not considered verified.
 - Deployment environment variables are canonical for provider and deployment
   secrets. Reserve Rails encrypted credentials for framework material where
   Rails expects them.
-- Never support environment-variable and encrypted-credentials fallbacks for
-  the same provider key.
+- Never support environment-variable and encrypted-credentials fallbacks for the
+  same provider key.
 - `bin/doctor` reports missing required key names without printing values.
 - Keep non-secret provider settings separate where practical.
 - Amp fixture mode works without provider secrets. Orb/workspace secrets are
@@ -136,9 +138,8 @@ Sentry, Honeybadger, and similar services are optional adapters behind that
 boundary.
 
 OpenTelemetry is a separate capability, included by the `internal` profile and
-absent from `minimal` and `personal`. It instruments Rails, Active Record,
-Solid Queue, and Faraday. Telemetry exports only when an OTLP endpoint is
-configured.
+absent from `minimal` and `personal`. It instruments Rails, Active Record, Solid
+Queue, and Faraday. Telemetry exports only when an OTLP endpoint is configured.
 
 The internal/integrations capability records:
 
@@ -151,17 +152,17 @@ The internal/integrations capability records:
 Do not hard-code a commercial observability vendor.
 
 Initial retention guidance is 30 days for logs and 7 days for traces. Never log
-provider response bodies. Audit-event retention is application-specific and
-has no default deletion policy. Sensitive snapshots and uploads also require
-an application-specific retention decision.
+provider response bodies. Audit-event retention is application-specific and has
+no default deletion policy. Sensitive snapshots and uploads also require an
+application-specific retention decision.
 
 ## Deployment-specific notes
 
 ### exe.dev
 
 Use one VM per app unless evidence supports sharing. exe.dev's persistent disks,
-Docker support, managed HTTPS/custom domains, and single proxied public port
-fit the Compose topology. It has no public IP/private VM network assumptions to
+Docker support, managed HTTPS/custom domains, and single proxied public port fit
+the Compose topology. It has no public IP/private VM network assumptions to
 build upon; keep PostgreSQL local/private.
 
 ### Render
@@ -173,8 +174,8 @@ remain readable and replaceable.
 ### Fly.io
 
 Use web and worker process groups/machines from the same image. Keep volumes and
-database topology explicit. Do not assume local file storage survives scaling
-or machine replacement.
+database topology explicit. Do not assume local file storage survives scaling or
+machine replacement.
 
 ## Security defaults
 

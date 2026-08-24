@@ -6,5 +6,6 @@ require "inertia_rails/minitest"
 module ActiveSupport
   class TestCase
     parallelize(workers: 2)
+    fixtures :all
   end
 end

@@ -28,8 +28,7 @@ module RailsAppStarterKit
     config.exceptions_app = routes
     config.middleware.insert_after ActionDispatch::RequestId, RequestContext
 
-    # File workflows and image processing are configured in Phase 4.
-    config.active_storage.variant_processor = :disabled
+    config.active_storage.variant_processor = :vips
 
     config.generators do |generators|
       generators.assets = false

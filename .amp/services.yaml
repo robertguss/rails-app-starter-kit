@@ -1,4 +1,12 @@
 services:
+  mailpit:
+    command: mailpit --smtp 127.0.0.1:1025 --listen 0.0.0.0:8025
+    port: 8025
+    health: /
+    portal:
+      title: Mailpit
+      description: Captured development email
+      review: false
   app:
     command: bin/orb-dev
     port: 3000

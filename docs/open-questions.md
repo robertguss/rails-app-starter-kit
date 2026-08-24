@@ -5,8 +5,7 @@ Last updated: 2026-08-24
 These questions are deliberately visible so future agents do not silently turn
 proposals into facts. Robert accepted the six foundational decisions and all
 cross-cutting implementation defaults below on 2026-08-24, then explicitly
-authorized Phase 1. Phase 1 is implemented; later phases still require separate
-authorization.
+authorized Phases 1–7. Phases 1–4 are implemented.
 
 ## Resolved foundational decisions
 
@@ -156,8 +155,6 @@ remain optional.
 
 - Phase 1 framework, runtime, gem, and package versions were resolved and pinned
   in [`implementation/phase-1.md`](implementation/phase-1.md).
-- Inspect the current Rails authentication generator before extending its schema
-  in Phase 3.
 - Validate the accepted defaults through the planned skeleton and fake-provider
   vertical slices. Change them only when measured implementation evidence
   contradicts the decision.

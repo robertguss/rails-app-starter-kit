@@ -1,0 +1,13 @@
+.git
+.github
+.amp
+.bundle
+.env*
+log/*
+node_modules
+playwright-report
+public/vite*
+storage/*
+test-results
+tmp/*
+vendor/bundle

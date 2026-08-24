@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../config/environment"
+
+healthy = SolidQueue::Process.where(last_heartbeat_at: 2.minutes.ago..).exists?
+abort "No live Solid Queue process heartbeat" unless healthy
+puts "Solid Queue worker is healthy"

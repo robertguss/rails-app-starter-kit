@@ -4,7 +4,9 @@ ruby "4.0.6"
 
 gem "bootsnap", "1.25.0", require: false
 gem "bcrypt", "3.1.22"
+gem "aws-sdk-s3", "1.229.0", require: false
 gem "dotenv-rails", "3.2.0", groups: [ :development, :test ]
+gem "image_processing", "2.0.3"
 gem "inertia_rails", "3.22.0"
 gem "omniauth", "2.1.4"
 gem "omniauth-google-oauth2", "1.2.2"
@@ -12,6 +14,7 @@ gem "omniauth-rails_csrf_protection", "2.0.1"
 gem "pg", "1.6.3"
 gem "puma", "8.0.2"
 gem "rails", "8.1.3.1"
+gem "ruby-vips", "2.3.0"
 gem "solid_queue", "1.7.0"
 gem "vite_rails", "3.11.1"
 

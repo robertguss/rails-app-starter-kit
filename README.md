@@ -4,7 +4,8 @@ Provider-independent Rails application starter aimed at small internal tools and
 personal or family applications.
 
 The project now contains the reviewed Rails/Inertia foundation, deterministic
-developer/CI/Amp Orb workflow, and first-party closed-access authentication.
+developer/CI/Amp Orb workflow, first-party closed-access authentication, and
+Rails-native jobs/files/mail with portable image and recovery tooling.
 Authorized implementation of the remaining baseline phases is in progress.
 
 ## Why this project exists
@@ -71,7 +72,7 @@ will be copied into the starter.
 
 - Documentation baseline: foundational and cross-cutting implementation defaults
   accepted
-- Application implementation: Phases 1–3 complete; Phases 4–7 in progress
+- Application implementation: Phases 1–4 complete; Phases 5–7 in progress
 - Implementation authorization: Phases 1–7 granted
 - GitHub repository: private repository created at
   <https://github.com/robertguss/rails-app-starter-kit>

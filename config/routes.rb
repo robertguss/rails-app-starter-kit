@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   get "/auth/google_oauth2/callback" => "omniauth_callbacks#google"
   get "/auth/failure" => "omniauth_callbacks#failure"
   post "agent/login" => "agent_sessions#create"
+  resources :uploads, only: %i[create show destroy]
   get "settings/access" => "settings/access#index", as: :settings_access
   post "settings/access" => "settings/access#create"
   delete "settings/access/:id" => "settings/access#destroy"
