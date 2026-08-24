@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title data-inertia><%= content_for(:title) || "Rails App Starter Kit" %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A provider-independent Rails application foundation.">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <script>
+      (() => {
+        const theme = localStorage.getItem("rails-starter-theme") || "system"
+        const dark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        document.documentElement.classList.toggle("dark", dark)
+      })()
+    </script>
+    <%= vite_react_refresh_tag %>
+    <%= vite_client_tag %>
+    <%= vite_typescript_tag "application.tsx" %>
+  </head>
+
+  <body class="min-h-svh bg-background text-foreground antialiased">
+    <%= yield %>
+  </body>
+</html>

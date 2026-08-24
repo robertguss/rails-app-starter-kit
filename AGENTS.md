@@ -1,19 +1,20 @@
 # AGENTS.md
 
-This repository designs and will eventually implement Robert Guss's
-provider-independent Rails application starter kit.
+This repository designs and implements Robert Guss's provider-independent Rails
+application starter kit.
 
 ## Current phase
 
-The repository is in a **documentation-only design phase**. Do not generate a
-Rails app, add dependencies, or implement application code until Robert
-explicitly approves the implementation phase. Documentation corrections and
-design refinements are allowed when requested.
+Robert explicitly authorized and the repository now contains **Phase 1: the
+runnable Rails/Inertia foundation**. Phase 2 and later functionality remains
+unauthorized. Do not add deterministic workflow infrastructure, authentication,
+operational capabilities, profiles/recipes, integrations, deployment, or other
+later-phase behavior without Robert's explicit approval for that phase.
 
 Robert accepted the foundational preimplementation decisions and cross-cutting
 implementation defaults recorded in `docs/decision-register.md` on 2026-08-24.
-That acceptance resolves the design blockers but does not authorize Phase 1
-implementation.
+The implemented Phase 1 boundary and selected versions are recorded in
+`docs/implementation/phase-1.md`.
 
 Start every session by reading:
 
@@ -34,8 +35,8 @@ Then read the architecture or roadmap documents relevant to the task.
   requirement.
 - Preserve first-party ownership of application identity, data, sessions,
   infrastructure, and business logic.
-- Hosted services may be optional adapters. They must not become required
-  domain boundaries.
+- Hosted services may be optional adapters. They must not become required domain
+  boundaries.
 - Prefer boring Rails conventions and explicit app-local code over a custom
   framework, plugin runtime, or dependency-injection system.
 - Provider-specific integrations belong in recipes or applications, never the
@@ -50,8 +51,8 @@ Then read the architecture or roadmap documents relevant to the task.
   the evidence and update the decision deliberately.
 - Keep settled decisions, proposals, and open questions visibly distinct.
 - Promote a feature into the starter only when it is a universal security or
-  operational default, part of a declared profile, or proven genuinely
-  reusable by real applications.
+  operational default, part of a declared profile, or proven genuinely reusable
+  by real applications.
 - A generated recipe must leave normal application-owned Rails code. Do not
   create a runtime plugin registry.
 - Environment variables configure installed features; they do not hide unused
@@ -70,10 +71,9 @@ approval for that action.
 The Event Horizon research contains family and child-product context. Keep this
 repository private until Robert has reviewed what may be published.
 
-## Planned verification interface
+## Verification interface
 
-Once implementation starts, the repository should converge on these standard
-commands:
+Phase 2 will establish these standard commands:
 
 ```text
 bin/setup       # idempotent fresh-clone setup
@@ -82,5 +82,6 @@ bin/check       # complete deterministic verification
 bin/orb-dev     # Amp Orb service entrypoint
 ```
 
-Do not claim these commands exist while the repository remains documentation
-only.
+Until Phase 2 is authorized and implemented, use the direct Phase 1 commands in
+`docs/implementation/phase-1.md` and do not claim this canonical interface
+exists.

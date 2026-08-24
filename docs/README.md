@@ -1,6 +1,6 @@
 # Documentation Index
 
-Status: foundational and implementation defaults accepted; not implemented
+Status: Phase 1 implemented; later phases proposed
 
 Last updated: 2026-08-24
 
@@ -34,6 +34,7 @@ This index is the durable entry point for future Amp sessions and fresh orbs.
 ## Execution
 
 - [Baseline implementation plan](implementation-plan.md)
+- [Phase 1 implementation record](implementation/phase-1.md)
 - [Combined roadmap](roadmap.md)
 - [Event Horizon rebuild roadmap](roadmaps/james-reading-app.md)
 - [LX Internal Tools rebuild roadmap](roadmaps/lx-internal-tools.md)
@@ -65,5 +66,5 @@ This index is the durable entry point for future Amp sessions and fresh orbs.
   [`robertguss/wts-student-success-internal-tools`](https://github.com/robertguss/wts-student-success-internal-tools)
 
 These documents synthesize the sources; they do not copy implementation from
-`buildermethods/build-new`, whose repository did not expose a recognized
-license when reviewed.
+`buildermethods/build-new`, whose repository did not expose a recognized license
+when reviewed.

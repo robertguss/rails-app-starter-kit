@@ -1,6 +1,6 @@
 # Baseline Starter-Kit Implementation Plan
 
-Status: proposed; implementation requires Robert's approval
+Status: Phase 1 implemented; Phases 2–7 require Robert's approval
 
 Last updated: 2026-08-24
 
@@ -10,8 +10,8 @@ Produce a reviewed `0.1` baseline that can generate or configure a clean
 `minimal`, `personal`, or `internal` Rails application, run deterministically in
 an Amp Orb, and deploy the same image to an owned VM or PaaS.
 
-This plan deliberately separates framework preservation, behavior additions,
-and validation. Each phase must leave a reviewable, passing repository.
+This plan deliberately separates framework preservation, behavior additions, and
+validation. Each phase must leave a reviewable, passing repository.
 
 ## Phase 0 — Documentation and decision freeze
 
@@ -33,6 +33,9 @@ and validation. Each phase must leave a reviewable, passing repository.
 - Robert explicitly authorizes implementation.
 
 ## Phase 1 — Runnable Rails/Inertia foundation
+
+Status: implemented on 2026-08-24. See the
+[Phase 1 implementation record](implementation/phase-1.md).
 
 ### Work
 
@@ -67,8 +70,8 @@ and validation. Each phase must leave a reviewable, passing repository.
 
 ### Work
 
-1. Add locked Bundler/pnpm installation and standard scripts:
-   `bin/setup`, `bin/dev`, and `bin/check`.
+1. Add locked Bundler/pnpm installation and standard scripts: `bin/setup`,
+   `bin/dev`, and `bin/check`.
 2. Add `Procfile.dev` with Rails, Vite, and worker roles, run through Foreman by
    `bin/dev`; do not retain aube.
 3. Add Minitest, Vitest/React Testing Library, and Playwright harnesses.
@@ -147,9 +150,9 @@ and validation. Each phase must leave a reviewable, passing repository.
 4. Configure Action Mailer with Mailpit development capture, the test adapter,
    and portable SMTP production boundary including Google Workspace relay.
 5. Build one production OCI image with web, worker, and release commands.
-6. Add Compose local/owned-VM topology and one-shot
-   `bin/rails db:prepare` release role; use corresponding Render pre-deploy and
-   Fly release commands rather than migrating on process startup.
+6. Add Compose local/owned-VM topology and one-shot `bin/rails db:prepare`
+   release role; use corresponding Render pre-deploy and Fly release commands
+   rather than migrating on process startup.
 7. Add backup, restore, retention, and restore-drill scripts/docs.
 8. Add startup configuration validation without secret disclosure and recipe
    documentation for secret ownership, scopes, rotation, verification, and
@@ -210,8 +213,8 @@ This phase creates provider-neutral operational support, not provider clients.
 2. Add explicit response parsers returning Ruby `Data` and a safe error
    hierarchy without initial `dry-schema`.
 3. Add operations with the accepted actor/kind/status/idempotency/step/progress,
-   sanitized request/result, error, and lifecycle fields plus the partial
-   unique idempotency constraint.
+   sanitized request/result, error, and lifecycle fields plus the partial unique
+   idempotency constraint.
 4. Share sanitized audit events with authentication and access administration.
 5. Add Solid Queue claim/stale/retry examples, concurrency limits, and a
    PostgreSQL lease/token-bucket example for strict cross-worker pacing.

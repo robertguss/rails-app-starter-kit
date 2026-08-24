@@ -1,11 +1,10 @@
 # Rails App Starter Kit
 
-Design repository for a provider-independent Rails application starter aimed at
-small internal tools and personal or family applications.
+Provider-independent Rails application starter aimed at small internal tools and
+personal or family applications.
 
-The project is currently in **documentation and architecture planning**. No
-Rails application has been generated yet. Implementation must wait until Robert
-reviews the captured baseline and approves the first implementation phase.
+The project now contains the reviewed **Phase 1 Rails/Inertia foundation**.
+Later phases remain unimplemented and require separate authorization.
 
 ## Why this project exists
 
@@ -20,6 +19,29 @@ topology first-party and portable.
 The recommended direction is a Rails modular monolith with Inertia React,
 PostgreSQL, and boring infrastructure that can run on an owned Linux VM, Render,
 or Fly.io.
+
+## Phase 1 application
+
+The runnable reference application includes Rails 8.1, PostgreSQL, Inertia
+Rails, React 19, TypeScript, Vite, Tailwind CSS 4, the restrained shadcn/ui
+baseline, responsive light/dark application shell, foundation states, and a
+Rails-validated Inertia form round trip. Production server-side rendering is
+explicitly disabled.
+
+Runtime and package versions, authoritative sources, architecture notes, and
+database conventions are recorded in the
+[Phase 1 implementation record](docs/implementation/phase-1.md).
+
+Phase 2 will establish the canonical `bin/setup`, `bin/dev`, and `bin/check`
+workflow. Until then, after installing the pinned runtimes and PostgreSQL:
+
+```text
+bundle install
+pnpm install --frozen-lockfile
+bin/rails db:prepare
+bin/rails server            # terminal 1
+bin/vite dev                # terminal 2
+```
 
 ## Start here
 
@@ -49,10 +71,10 @@ will be copied into the starter.
 
 ## Status
 
-- Documentation baseline: foundational and cross-cutting implementation
-  defaults accepted
-- Application implementation: not started
-- Implementation authorization: not yet granted
+- Documentation baseline: foundational and cross-cutting implementation defaults
+  accepted
+- Application implementation: Phase 1 runnable Rails/Inertia foundation
+- Implementation authorization: Phase 1 granted; Phase 2 and later not granted
 - GitHub repository: private repository created at
   <https://github.com/robertguss/rails-app-starter-kit>
 
