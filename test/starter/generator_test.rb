@@ -22,6 +22,7 @@ class StarterGeneratorTest < ActiveSupport::TestCase
     refute_path destination, "starter"
     refute_path destination, "bin/new"
     refute_path destination, "docs/implementation-plan.md"
+    assert_deployment_identity(destination, auth: "none")
     assert_clean_of_institutional_code(destination)
   end
 
@@ -33,6 +34,7 @@ class StarterGeneratorTest < ActiveSupport::TestCase
     assert_path destination, "app/controllers/password_recoveries_controller.rb"
     refute_path destination, "app/controllers/omniauth_callbacks_controller.rb"
     refute_path destination, "app/controllers/uploads_controller.rb"
+    assert_deployment_identity(destination, auth: "password")
     assert_clean_of_institutional_code(destination)
   end
 
@@ -43,6 +45,7 @@ class StarterGeneratorTest < ActiveSupport::TestCase
     refute_path destination, "app/controllers/password_recoveries_controller.rb"
     refute_path destination, "app/controllers/uploads_controller.rb"
     assert_equal "google", destination.join(".env.example").read[/^AUTH_METHODS=(.*)$/, 1]
+    assert_deployment_identity(destination, auth: "google")
     assert_clean_of_institutional_clients(destination)
   end
 
@@ -91,6 +94,29 @@ class StarterGeneratorTest < ActiveSupport::TestCase
 
     def assert_path(destination, relative)
       assert destination.join(relative).exist?, "expected #{relative} to exist"
+    end
+
+    def assert_deployment_identity(destination, auth:)
+      application = receipt(destination).fetch("application")
+      compose = destination.join("compose.yaml").read
+      compose_environment = destination.join("compose.env.example").read
+      environment = destination.join(".env.example").read
+      render = destination.join("render.yaml").read
+      services = destination.join(".amp/services.yaml").read
+
+      assert_includes compose, "name: #{application}"
+      assert_includes compose, "image: #{application}:local"
+      assert_includes compose, "AUTH_METHODS: ${AUTH_METHODS:-#{auth}}"
+      assert_includes compose, "#{application.tr('-', '_')}_production"
+      assert_includes compose_environment, "AUTH_METHODS=#{auth}"
+      assert_includes environment, "AUTH_METHODS=#{auth}"
+      assert_includes render, "name: #{application}-web"
+      assert_includes services, "title: #{application.split('-').map(&:capitalize).join(' ')}"
+      if auth == "google"
+        assert_includes environment, "GOOGLE_WORKSPACE_DOMAINS=example.com"
+        assert_includes environment, "GOOGLE_CLIENT_ID="
+        assert_includes environment, "GOOGLE_CLIENT_SECRET="
+      end
     end
 
     def refute_path(destination, relative)

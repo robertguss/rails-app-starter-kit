@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Generated profiles now carry their selected authentication method into the
+  Compose examples and consistently rename Compose, PostgreSQL, Render, MinIO,
+  and Orb service identities instead of retaining starter-owned names.
+
 ## 0.1.0 — 2026-08-24
 
 Initial private baseline: Rails/Inertia application foundation, deterministic

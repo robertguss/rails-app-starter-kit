@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: starter-web
+    name: rails-app-starter-kit-web
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -10,7 +10,7 @@ services:
     envVars: &app_env
       - key: DATABASE_URL
         fromDatabase:
-          name: starter-postgres
+          name: rails-app-starter-kit-postgres
           property: connectionString
       - key: SECRET_KEY_BASE
         sync: false
@@ -33,7 +33,7 @@ services:
       - key: AWS_SECRET_ACCESS_KEY
         sync: false
   - type: worker
-    name: starter-worker
+    name: rails-app-starter-kit-worker
     runtime: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -42,5 +42,5 @@ services:
     envVars: *app_env
 
 databases:
-  - name: starter-postgres
+  - name: rails-app-starter-kit-postgres
     plan: free

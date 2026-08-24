@@ -12,6 +12,6 @@ services:
     port: 3000
     health: /ready
     portal:
-      title: Rails starter
+      title: Rails App Starter Kit
       description: Application and responsive UI review
       review: true

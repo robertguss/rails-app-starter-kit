@@ -33,6 +33,7 @@ module Starter
       copy_source(destination)
       GENERATED_REMOVALS.each { |path| FileUtils.rm_rf(destination.join(path)) }
       configuration.fetch("overlays").each { |overlay| copy_tree(root.join("starter", overlay), destination) }
+      configure_auth(destination, configuration.fetch("auth"))
       rename_application(destination, name)
       write_receipt(destination, name:, profile:, capabilities: configuration.fetch("capabilities"), recipes: [])
       recipes.each { |recipe| apply_recipe(recipe, destination:, capabilities: configuration.fetch("capabilities")) }
@@ -140,6 +141,20 @@ module Starter
       def copy_tree(source, destination)
         raise Error, "missing overlay: #{source.relative_path_from(root)}" unless source.directory?
         FileUtils.cp_r("#{source}/.", destination, preserve: true)
+      end
+
+      def configure_auth(destination, auth)
+        [ ".env.example", "compose.yaml", "compose.env.example" ].each do |relative|
+          path = destination.join(relative)
+          text = path.read
+          text.sub!(/AUTH_METHODS: \$\{AUTH_METHODS:-(?:none|password|google)\}/, "AUTH_METHODS: ${AUTH_METHODS:-#{auth}}")
+          text.sub!(/^AUTH_METHODS=(?:none|password|google)$/, "AUTH_METHODS=#{auth}")
+          if relative == ".env.example" && auth == "google"
+            text.sub!("AUTH_METHODS=google\n", "AUTH_METHODS=google\nGOOGLE_WORKSPACE_DOMAINS=example.com\n")
+            text.sub!("SECRET_KEY_BASE=\n", "SECRET_KEY_BASE=\nGOOGLE_CLIENT_ID=\nGOOGLE_CLIENT_SECRET=\n")
+          end
+          path.write(text)
+        end
       end
 
       def rename_application(destination, name)
