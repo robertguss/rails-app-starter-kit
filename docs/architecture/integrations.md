@@ -21,7 +21,7 @@ approved user -> validate/preview -> durable operation -> provider client
 Installed integration code is ordinary app-local Rails code:
 
 ```text
-app/integrations/
+app/services/integrations/
   canvas/
     client.rb
     configuration.rb
@@ -32,8 +32,8 @@ app/integrations/
     configuration.rb
     parsers/
 
-app/jobs/integrations/
-  canvas/risk_pull_job.rb
+app/jobs/
+  canvas_risk_pull_job.rb
 ```
 
 Do not require each provider to implement a generic CRUD/resource interface.
@@ -42,8 +42,8 @@ batch rules are appropriately provider-specific.
 
 ## HTTP foundation
 
-The baseline is Faraday plus retry middleware, with common middleware or a
-small configured factory providing:
+The baseline is Faraday plus retry middleware, with common middleware or a small
+configured factory providing:
 
 - explicit connect, read, and write timeouts;
 - bounded exponential backoff with jitter;
@@ -116,8 +116,8 @@ The `integrations` capability should install an `operations` model with:
 - error category and safe message;
 - heartbeat, started, and finished timestamps.
 
-Enforce a unique `(kind, idempotency_key)` constraint when an idempotency key
-is present.
+Enforce a unique `(kind, idempotency_key)` constraint when an idempotency key is
+present.
 
 Suggested status vocabulary:
 
@@ -135,10 +135,10 @@ Use durable operation state and stale-heartbeat checks. Solid Queue jobs must
 use database constraints or explicit claims to prevent duplicate work. Do not
 apply blanket retries: retry categorized transient failures only with bounded
 exponential backoff and jitter, respect `Retry-After`, and default to five
-attempts for safe transient work. Discard permanent authentication, request,
-and configuration failures; leave unknown failures visible and failed. An
-ambiguous provider mutation must not be retried unless a provider idempotency
-key or state reconciliation makes that retry safe.
+attempts for safe transient work. Discard permanent authentication, request, and
+configuration failures; leave unknown failures visible and failed. An ambiguous
+provider mutation must not be retried unless a provider idempotency key or state
+reconciliation makes that retry safe.
 
 The integrations capability shares one sanitized `audit_events` table with
 authentication and access administration. External commands record actor,
@@ -180,11 +180,11 @@ public API, OpenAPI client, or TanStack Query.
 
 ## Concurrency and provider pacing
 
-Use Solid Queue concurrency limits for ordinary concurrent work. When a
-provider enforces a strict account-wide quota across workers, coordinate it
-with a PostgreSQL-backed lease or token bucket. Provider-specific quota rules
-remain in provider recipes. Never rely on in-memory rate limiting for a shared
-account quota across processes.
+Use Solid Queue concurrency limits for ordinary concurrent work. When a provider
+enforces a strict account-wide quota across workers, coordinate it with a
+PostgreSQL-backed lease or token bucket. Provider-specific quota rules remain in
+provider recipes. Never rely on in-memory rate limiting for a shared account
+quota across processes.
 
 ## Files, imports, and exports
 

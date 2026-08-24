@@ -39,6 +39,7 @@ module RuntimeConfiguration
     require_names(invalid, environment, %w[SMTP_ADDRESS SMTP_PORT SMTP_DOMAIN]) if mail == "smtp"
 
     require_names(invalid, environment, %w[GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET GOOGLE_WORKSPACE_DOMAINS]) if methods.include?("google")
+    invalid << "OTEL_EXPORTER_OTLP_ENDPOINT" unless valid_optional_http_url?(environment["OTEL_EXPORTER_OTLP_ENDPOINT"])
     invalid.uniq.sort
   end
 
@@ -68,4 +69,14 @@ module RuntimeConfiguration
     false
   end
   private_class_method :valid_database_url?
+
+  def self.valid_optional_http_url?(value)
+    return true if value.to_s.empty?
+
+    uri = URI.parse(value)
+    %w[http https].include?(uri.scheme) && uri.host.present?
+  rescue URI::InvalidURIError
+    false
+  end
+  private_class_method :valid_optional_http_url?
 end

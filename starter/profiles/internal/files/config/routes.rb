@@ -18,6 +18,10 @@ Rails.application.routes.draw do
   delete "settings/access/:id" => "settings/access#destroy"
   post "settings/access/:id/transfer" => "settings/access#transfer"
 
+  resources :operations, only: %i[index create show] do
+    get :status, on: :member
+  end
+
   root "home#show"
 
   match "/404", to: "errors#not_found", via: :all

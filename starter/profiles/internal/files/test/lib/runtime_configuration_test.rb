@@ -52,11 +52,12 @@ class RuntimeConfigurationTest < ActiveSupport::TestCase
       "DATABASE_URL" => "sqlite3:tmp/db",
       "FORCE_SSL" => "sometimes",
       "MAIL_DELIVERY_METHOD" => "sendmail",
+      "OTEL_EXPORTER_OTLP_ENDPOINT" => "file:///tmp/traces",
       "SECRET_KEY_BASE" => "short",
       "STORAGE_SERVICE" => "unknown"
     )
 
-    assert_equal %w[APP_HOST AUTH_METHODS DATABASE_URL FORCE_SSL MAIL_DELIVERY_METHOD SECRET_KEY_BASE STORAGE_SERVICE],
+    assert_equal %w[APP_HOST AUTH_METHODS DATABASE_URL FORCE_SSL MAIL_DELIVERY_METHOD OTEL_EXPORTER_OTLP_ENDPOINT SECRET_KEY_BASE STORAGE_SERVICE],
       RuntimeConfiguration.invalid_names(environment:)
   end
 end

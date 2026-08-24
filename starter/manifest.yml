@@ -27,6 +27,10 @@ profiles:
     capabilities:
       - closed-access
       - google-auth
+      - integration-http
+      - operations
+      - operation-items
+      - opentelemetry
       - jobs
       - storage
       - email
@@ -34,6 +38,9 @@ profiles:
       - common/files
       - capabilities/closed-access/files
       - capabilities/google-auth/files
+      - capabilities/integrations/files
+      - capabilities/operation-items/files
+      - capabilities/opentelemetry/files
       - profiles/internal/files
 
 recipes:

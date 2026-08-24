@@ -56,7 +56,12 @@ for profile in minimal personal internal; do
   assert_absent "$app" 'CANVAS_|canvas_(client|api|base_url|access_token)|populi|airtable|watermark' "institutional provider code"
   if [[ "$profile" != internal ]]; then
     assert_absent "$app" 'GOOGLE_|omniauth|google_oauth' "Google authentication code"
-    assert_absent "$app" 'operation_items|fixture_provider|integrations/client|OTEL_' "internal integration code"
+    assert_absent "$app" 'operation_items|fixture_provider|class Operation <|class ProviderPace|INTEGRATION_(CONNECT|READ|WRITE|MAX)|OTEL_|gem "faraday|gem "opentelemetry' "internal integration code"
+  else
+    test -f "$app/app/models/operation.rb"
+    test -f "$app/app/services/integrations/http_client.rb"
+    test -f "$app/config/initializers/opentelemetry.rb"
+    grep -q "operation-items" "$app/.starter.yml"
   fi
 done
 
