@@ -34,6 +34,10 @@ audit_events
   actor_id, action, subject, metadata, occurred_at
 ```
 
+`audit_events` is the one sanitized application audit trail shared by
+authentication, access administration, and external commands. Provider tokens,
+raw response bodies, and other secrets never belong in its metadata.
+
 The exact Rails 8 authentication generator schema should be inspected before
 implementation and extended rather than replaced unnecessarily.
 

@@ -28,7 +28,8 @@ must not create hidden runtime behavior.
 - Docker image and local development topology
 - Test, lint, format, build, security, and CI commands
 - Amp Orb setup/resume/services contract
-- Structured production logging and request correlation
+- Structured JSON production logging, request/job correlation, redaction,
+  health/readiness, and container log-rotation guidance
 
 ## Initial profiles
 
@@ -42,8 +43,6 @@ must not create hidden runtime behavior.
 
 ### `personal`
 
-Proposed defaults:
-
 - Foundation
 - Password authentication
 - Closed registration and one owner
@@ -55,8 +54,6 @@ Optional Google login, PWA, media, and family profiles are selected explicitly.
 
 ### `internal`
 
-Proposed defaults:
-
 - Foundation
 - Google Workspace authentication
 - Closed registration and access administration
@@ -65,10 +62,12 @@ Proposed defaults:
 - Durable operations, polling progress, and audit events
 - File imports/exports
 - Active Storage and Action Mailer
-- OpenTelemetry capability enabled when an exporter is configured
+- OpenTelemetry capability installed, with export enabled only when an OTLP
+  endpoint is configured
 
 The internal profile includes no Canvas, Populi, Airtable, Circle, or Watermark
-client.
+client. OpenTelemetry is a separate capability included by `internal`; it is
+absent from the `minimal` and `personal` profiles unless selected explicitly.
 
 ## Source repository and generated applications
 

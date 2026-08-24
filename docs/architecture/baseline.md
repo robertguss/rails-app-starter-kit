@@ -1,6 +1,6 @@
 # Recommended Baseline Architecture
 
-Status: accepted direction with proposed implementation details
+Status: accepted direction and implementation defaults
 
 Last updated: 2026-08-24
 
@@ -87,8 +87,11 @@ real workflow or transaction, not merely to wrap a model call.
 ## Inertia data model
 
 - Controllers authorize, load data, and pass explicit serializable props.
-- TypeScript page-prop types remain close to the page or in generated/shared
-  definitions only when reuse justifies it.
+- Define explicit TypeScript page-prop interfaces beside their pages. Do not
+  add Ruby-to-TypeScript generation initially.
+- Use Inertia forms and Rails validation errors for ordinary forms. Do not add
+  React Hook Form or Zod unless a specific interactive form justifies duplicate
+  client-side validation.
 - Inertia visits and form helpers own ordinary server-state transitions.
 - Local React state owns ephemeral interaction state.
 - TanStack Query is optional for a page that truly needs independent polling,
@@ -115,7 +118,12 @@ SQLite remains a possible later tiny-app recipe, not a v1 compatibility burden.
 
 ## Background work
 
-Solid Queue is the durable execution baseline. Jobs must be:
+Solid Queue is the durable execution baseline. It initially uses the same
+logical PostgreSQL database as the application with its own tables and
+connection pool. Move it to a separate database only after measured contention
+or scaling evidence.
+
+Jobs must be:
 
 - idempotent or explicitly non-retryable;
 - safe under process interruption;
@@ -126,25 +134,37 @@ Solid Queue is the durable execution baseline. Jobs must be:
 Not every API read should become a job. Small live reads can stay synchronous;
 imports, reports, mirrors, and external mutations should normally be queued.
 
+Do not apply blanket retries. Retry categorized transient failures only with
+bounded exponential backoff and jitter, respecting `Retry-After`; use five
+attempts as the initial default for safe transient work. Discard permanent
+authentication, request, and configuration failures. External writes require
+idempotency or reconciliation before retry. Unknown failures remain visible
+and failed, and ambiguous external mutations are never blindly retried.
+
 ## Files and email
 
 - Active Storage uses local disk in development and small owned-VM profiles.
 - Render/Fly use S3-compatible object storage.
+- MinIO is an optional Compose/CI compatibility profile, not a mandatory local
+  service. Normal tests use disk or SDK stubs as appropriate.
 - File workflows validate content type, size, checksum, ownership, and
   retention; browser-supplied MIME is not trusted alone.
-- Action Mailer is the owned email boundary. SMTP is the portable default;
-  provider adapters remain optional.
+- Action Mailer with generic SMTP is the owned, portable email boundary.
+  Google Workspace SMTP relay works through that configuration; Postmark,
+  Resend, SES, and other delivery providers remain optional recipes.
+- Development uses Mailpit, and tests use the Action Mailer test adapter.
 
 ## Minimal UI baseline
 
-Include a restrained, proven shadcn component set rather than the entire
-registry. The initial shell should cover:
+Install only this restrained shadcn component set in the baseline:
 
-- buttons, inputs, labels, forms, and validation messages;
-- dialogs, dropdowns, sheets, tooltips, alerts, and toasts;
-- cards, tables, badges, tabs, skeletons, and progress;
-- accessible navigation, responsive layout, dark mode, error, empty, and 404
-  states.
+```text
+alert, avatar, badge, button, card, checkbox, dialog, dropdown-menu,
+input, label, progress, select, separator, sheet, skeleton, sonner,
+table, tabs, textarea, tooltip
+```
 
-Install specialized charts, editors, calendars, command palettes, or drag/drop
-only when an app needs them.
+The shell also includes accessible navigation, responsive layout, dark mode,
+and error, empty, loading, and 404 states. Calendars, charts, command palettes,
+editors, drag/drop, and generic data-table abstractions are not baseline
+dependencies; install them only for an application that needs them.

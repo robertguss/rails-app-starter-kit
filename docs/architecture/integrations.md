@@ -1,6 +1,6 @@
 # Third-Party Integration Architecture
 
-Status: accepted direction; exact support code is proposed
+Status: accepted direction and implementation defaults
 
 Last updated: 2026-08-24
 
@@ -42,8 +42,8 @@ batch rules are appropriately provider-specific.
 
 ## HTTP foundation
 
-The proposed baseline is Faraday with common middleware or a small configured
-factory providing:
+The baseline is Faraday plus retry middleware, with common middleware or a
+small configured factory providing:
 
 - explicit connect, read, and write timeouts;
 - bounded exponential backoff with jitter;
@@ -70,7 +70,7 @@ External responses are untrusted even when HTTP status is successful.
 - Raise safe categorized errors with sanitized context.
 
 Start with explicit parsers. Add a validation library only when it removes
-meaningful repetition.
+meaningful repetition; do not add `dry-schema` initially.
 
 ## Shared error categories
 
@@ -110,14 +110,14 @@ owns its snapshots, cases, operation state, annotations, and audit history.
 
 The `integrations` capability should install an `operations` model with:
 
-- kind and status;
-- actor;
-- unique idempotency key;
-- current step and progress counts;
-- started, heartbeat, and finished timestamps;
-- safe result summary;
-- error category and message;
-- retry/resume metadata where supported.
+- `kind`, `status`, `actor_id`, optional `idempotency_key`, and `current_step`;
+- progress current and total;
+- safe request and result summaries;
+- error category and safe message;
+- heartbeat, started, and finished timestamps.
+
+Enforce a unique `(kind, idempotency_key)` constraint when an idempotency key
+is present.
 
 Suggested status vocabulary:
 
@@ -131,10 +131,19 @@ pending -> running -> succeeded
 An optional `operation_items` recipe supports per-row outcomes and failure CSVs
 for batch tools.
 
-Solid Queue jobs must use database constraints or explicit claims to prevent
-duplicate work. An ambiguous provider result after timeout must not be blindly
-retried unless a provider idempotency key or state reconciliation makes it
-safe.
+Use durable operation state and stale-heartbeat checks. Solid Queue jobs must
+use database constraints or explicit claims to prevent duplicate work. Do not
+apply blanket retries: retry categorized transient failures only with bounded
+exponential backoff and jitter, respect `Retry-After`, and default to five
+attempts for safe transient work. Discard permanent authentication, request,
+and configuration failures; leave unknown failures visible and failed. An
+ambiguous provider mutation must not be retried unless a provider idempotency
+key or state reconciliation makes that retry safe.
+
+The integrations capability shares one sanitized `audit_events` table with
+authentication and access administration. External commands record actor,
+target, sanitized intent, and outcome there rather than creating a second audit
+subsystem.
 
 ## User-triggered external writes
 
@@ -157,12 +166,25 @@ Baseline behavior can use polling:
 
 1. POST validates and creates an operation.
 2. Response redirects or returns the operation ID.
-3. React polls a small status endpoint or Inertia partial reload.
-4. The page remains useful across reloads.
-5. Latest successful data stays visible when a refresh fails.
-6. Batch tools expose row-level failures and downloadable remediation data.
+3. React polls a small same-origin JSON status endpoint every two seconds while
+   the operation is active, backing off toward ten seconds.
+4. Polling pauses while the page is hidden, resumes when visible or reloaded,
+   and stops when the operation reaches a terminal state.
+5. The page remains useful across reloads.
+6. Latest successful data stays visible when a refresh fails.
+7. Batch tools expose row-level failures and downloadable remediation data.
 
 SSE is an optional recipe. WebSockets are unnecessary for the current evidence.
+The JSON status endpoint is an application endpoint, not a commitment to a
+public API, OpenAPI client, or TanStack Query.
+
+## Concurrency and provider pacing
+
+Use Solid Queue concurrency limits for ordinary concurrent work. When a
+provider enforces a strict account-wide quota across workers, coordinate it
+with a PostgreSQL-backed lease or token bucket. Provider-specific quota rules
+remain in provider recipes. Never rely on in-memory rate limiting for a shared
+account quota across processes.
 
 ## Files, imports, and exports
 

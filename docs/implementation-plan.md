@@ -28,7 +28,8 @@ and validation. Each phase must leave a reviewable, passing repository.
 ### Exit criteria
 
 - Robert reviews the documents.
-- The six foundational decisions in `open-questions.md` are accepted.
+- The foundational and cross-cutting implementation defaults in
+  `open-questions.md` are accepted.
 - Robert explicitly authorizes implementation.
 
 ## Phase 1 — Runnable Rails/Inertia foundation
@@ -40,10 +41,13 @@ and validation. Each phase must leave a reviewable, passing repository.
 2. Generate the smallest Rails application with PostgreSQL.
 3. Install Inertia Rails, React 19, TypeScript, and Vite without production SSR.
 4. Establish one `app/frontend` root and path aliases.
-5. Install Tailwind CSS 4 and restrained shadcn/ui defaults.
+5. Install Tailwind CSS 4 and only the accepted restrained shadcn/ui component
+   set; do not add generic data-table/form/validation abstractions.
 6. Add root layout, responsive shell, dark mode, 404, error, empty, loading, and
    health states.
 7. Establish Active Record constraints and migration conventions.
+8. Use Inertia forms with Rails validation errors and explicit page-local
+   TypeScript prop interfaces without initial Ruby-to-TypeScript generation.
 
 ### Verification
 
@@ -65,16 +69,22 @@ and validation. Each phase must leave a reviewable, passing repository.
 
 1. Add locked Bundler/pnpm installation and standard scripts:
    `bin/setup`, `bin/dev`, and `bin/check`.
-2. Add Minitest, Vitest/React Testing Library, and Playwright harnesses.
-3. Add RuboCop, Brakeman, dependency auditing, lint, format, typecheck, and
+2. Add `Procfile.dev` with Rails, Vite, and worker roles, run through Foreman by
+   `bin/dev`; do not retain aube.
+3. Add Minitest, Vitest/React Testing Library, and Playwright harnesses.
+4. Add RuboCop, Brakeman, dependency auditing, lint, format, typecheck, and
    production build checks.
-4. Add CI from an empty PostgreSQL environment.
-5. Add per-worktree database naming.
-6. Add `.agents/setup`, `.agents/resume`, `.amp/services.yaml`, and
+5. Add CI from an empty PostgreSQL environment.
+6. Add per-worktree database naming.
+7. Add `.agents/setup`, `.agents/resume`, `.amp/services.yaml`, and
    `bin/orb-dev`.
-7. Add deterministic seed data and development-only agent login infrastructure
+8. Add deterministic seed data and development-only agent login infrastructure
    once sessions exist; until then, verify public flows.
-8. Add structured logs, request IDs, and redaction baseline.
+9. Add structured JSON logs, request/job correlation IDs, redaction,
+   health/readiness, container log-rotation guidance, and the `Rails.error`
+   reporting boundary.
+10. Add `.env.example`, ignored `.env.local`, development/test-only dotenv, and
+    `bin/doctor` that reports missing key names without values.
 
 ### Verification
 
@@ -128,15 +138,22 @@ and validation. Each phase must leave a reviewable, passing repository.
 
 ### Work
 
-1. Configure Solid Queue and decide queue database topology.
-2. Add representative idempotent job and worker health checks.
-3. Configure Active Storage for local disk and S3-compatible services.
-4. Configure Action Mailer with local capture and portable SMTP production
-   boundary.
+1. Configure Solid Queue in the same logical PostgreSQL database with its own
+   tables and pool; document the measured-evidence gate for a later split.
+2. Add representative idempotent job, worker health checks, and categorized
+   retry/discard conventions without blanket retries.
+3. Configure Active Storage for local disk and S3-compatible services; keep
+   MinIO an optional Compose/CI compatibility profile.
+4. Configure Action Mailer with Mailpit development capture, the test adapter,
+   and portable SMTP production boundary including Google Workspace relay.
 5. Build one production OCI image with web, worker, and release commands.
-6. Add Compose local/owned-VM topology.
+6. Add Compose local/owned-VM topology and one-shot
+   `bin/rails db:prepare` release role; use corresponding Render pre-deploy and
+   Fly release commands rather than migrating on process startup.
 7. Add backup, restore, retention, and restore-drill scripts/docs.
-8. Add startup configuration validation without secret disclosure.
+8. Add startup configuration validation without secret disclosure and recipe
+   documentation for secret ownership, scopes, rotation, verification, and
+   rollback.
 
 ### Verification
 
@@ -190,16 +207,22 @@ This phase creates provider-neutral operational support, not provider clients.
 
 1. Add configured Faraday boundary with timeouts, bounded retry, redaction,
    correlation, and deterministic stubs.
-2. Add runtime response-parsing convention and safe error hierarchy.
-3. Add operations with actor, status, idempotency, progress, heartbeat, result,
-   and error summary.
-4. Add audit events.
-5. Add Solid Queue claim/stale/retry examples.
-6. Add Inertia/React polling progress and durable result view.
+2. Add explicit response parsers returning Ruby `Data` and a safe error
+   hierarchy without initial `dry-schema`.
+3. Add operations with the accepted actor/kind/status/idempotency/step/progress,
+   sanitized request/result, error, and lifecycle fields plus the partial
+   unique idempotency constraint.
+4. Share sanitized audit events with authentication and access administration.
+5. Add Solid Queue claim/stale/retry examples, concurrency limits, and a
+   PostgreSQL lease/token-bucket example for strict cross-worker pacing.
+6. Add the same-origin JSON polling status endpoint and React progress view with
+   two-second active polling, backoff toward ten seconds, hidden-page pause,
+   terminal stop, and reload recovery.
 7. Add optional operation items/import foundation as separate capabilities if
    the scope stays coherent.
 8. Add fixture-provider mode and failure simulations.
-9. Add provider metrics through the selected observability capability.
+9. Add the OpenTelemetry capability for Rails, Active Record, Solid Queue, and
+   Faraday with no export unless OTLP is configured.
 
 ### Verification vertical slice
 

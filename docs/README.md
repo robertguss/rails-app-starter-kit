@@ -1,6 +1,6 @@
 # Documentation Index
 
-Status: foundational decisions accepted; not implemented
+Status: foundational and implementation defaults accepted; not implemented
 
 Last updated: 2026-08-24
 
@@ -42,6 +42,8 @@ This index is the durable entry point for future Amp sessions and fresh orbs.
 
 - **Accepted direction**: Robert agreed with the direction during design. Exact
   implementation may still require normal engineering decisions.
+- **Accepted implementation default**: use this choice when its phase begins
+  unless measured implementation evidence justifies revisiting it.
 - **Proposed**: recommended but should be reviewed before implementation.
 - **Deferred**: intentionally excluded until evidence requires it.
 - **Rejected as default**: may still be appropriate for a particular app, but

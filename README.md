@@ -49,7 +49,8 @@ will be copied into the starter.
 
 ## Status
 
-- Documentation baseline: foundational decisions accepted
+- Documentation baseline: foundational and cross-cutting implementation
+  defaults accepted
 - Application implementation: not started
 - Implementation authorization: not yet granted
 - GitHub repository: private repository created at

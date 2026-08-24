@@ -62,8 +62,15 @@ The worker uses the same image and environment as web with a different command.
 - exe.dev: private container/service on persistent disk for the simplest owned
   profile
 - Render/Fly: managed or separately operated PostgreSQL
-- Production migrations: explicit release command, never hidden in every web
-  process startup
+- Solid Queue initially uses the same logical database with its own tables and
+  connection pool; split it only after measured contention or scaling evidence
+- Production migrations: run `bin/rails db:prepare` once before updated web and
+  worker processes, never hidden in every process startup
+
+Use a Compose one-shot release container, Render pre-deploy command, or Fly
+release command for that step. Evolve non-atomic schemas with an
+expand/migrate/contract sequence so old and new processes can coexist during a
+rolling release.
 
 ### Active Storage
 
@@ -89,36 +96,51 @@ A backup that has never been restored is not considered verified.
 
 - Rails liveness endpoint that does not require external providers
 - Readiness recipe checking database connectivity and migration compatibility
-- Separate queue/stale-operation visibility
+- Queue visibility and, when the integrations capability is installed,
+  stale-operation visibility
 - Health checks must not call Canvas, Google, or other third parties
 - Deployment links and Amp services should expose health status
 
 ## Secrets
 
 - Commit `.env.example` with key names and safe examples only.
+- Ignore `.env.local`; use `dotenv-rails` in development and test only.
 - Never expose secret values to Vite/browser variables.
-- Use deployment environment variables or Rails encrypted credentials with a
-  deployment-provided master key.
-- Validate required key names at boot for installed features without printing
-  values.
+- Deployment environment variables are canonical for provider and deployment
+  secrets. Reserve Rails encrypted credentials for framework material where
+  Rails expects them.
+- Never support environment-variable and encrypted-credentials fallbacks for
+  the same provider key.
+- `bin/doctor` reports missing required key names without printing values.
 - Keep non-secret provider settings separate where practical.
-- Document rotation and use separate development/test/production credentials.
+- Amp fixture mode works without provider secrets. Orb/workspace secrets are
+  injected and are never written by `.agents/setup`.
+- Use separate development/test/production credentials.
 
-The implementation phase must settle whether environment variables are the
-canonical provider-secret source with credentials reserved for Rails core, or
-whether both use a documented precedence rule.
+Every provider recipe documents the secret owner, configuration location,
+required scopes, consumers, rotation procedure, overlap period, verification,
+and rollback. Rotation cadence follows provider risk and capability; do not
+invent a universal 90-day rule.
 
 ## Observability
 
 Every profile:
 
-- structured production logs;
+- structured JSON production logs and container log-rotation guidance;
 - request/job/operation correlation IDs;
 - secret and sensitive-body redaction;
-- actionable unhandled-error reporting hook;
+- `Rails.error` as the application-owned error-reporting boundary;
 - health and queue visibility.
 
-Internal/integrations capability:
+Sentry, Honeybadger, and similar services are optional adapters behind that
+boundary.
+
+OpenTelemetry is a separate capability, included by the `internal` profile and
+absent from `minimal` and `personal`. It instruments Rails, Active Record,
+Solid Queue, and Faraday. Telemetry exports only when an OTLP endpoint is
+configured.
+
+The internal/integrations capability records:
 
 - provider request latency/count/status/retry metrics;
 - rate-limit events;
@@ -127,6 +149,11 @@ Internal/integrations capability:
 - optional OTLP export.
 
 Do not hard-code a commercial observability vendor.
+
+Initial retention guidance is 30 days for logs and 7 days for traces. Never log
+provider response bodies. Audit-event retention is application-specific and
+has no default deletion policy. Sensitive snapshots and uploads also require
+an application-specific retention decision.
 
 ## Deployment-specific notes
 

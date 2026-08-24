@@ -2,10 +2,10 @@
 
 Last updated: 2026-08-24
 
-This register separates accepted direction from proposed implementation detail.
-No decision in this file means the feature has been implemented.
+This register separates accepted defaults from evidence-driven deferrals. No
+decision in this file means the feature has been implemented.
 
-## Accepted direction
+## Accepted direction and implementation defaults
 
 | Area | Decision | Rationale |
 |---|---|---|
@@ -16,11 +16,19 @@ No decision in this file means the feature has been implemented.
 | UI bridge | Inertia Rails with React 19 and TypeScript | Retains rich React UX without requiring a separate API product or SPA auth architecture |
 | Frontend build | Vite | Fast and already familiar from Robert's applications |
 | Styling | Tailwind CSS 4, shadcn/ui, Radix primitives, Lucide, CSS-variable theming, dark mode | Preserves current UI speed and flexibility |
+| UI baseline | Install only `alert`, `avatar`, `badge`, `button`, `card`, `checkbox`, `dialog`, `dropdown-menu`, `input`, `label`, `progress`, `select`, `separator`, `sheet`, `skeleton`, `sonner`, `table`, `tabs`, `textarea`, and `tooltip`; add calendars, charts, command palettes, editors, drag/drop, and data-table abstractions only when needed | Keeps generated applications useful without turning the component registry into baseline weight |
+| Forms and page contracts | Use Inertia forms and Rails validation errors; define explicit TypeScript page-prop interfaces beside pages; add React Hook Form, Zod, or Ruby-to-TypeScript generation only after a concrete need | Avoids duplicate validation and contract machinery while preserving compiler-checked page props |
+| Package and process tooling | Use Bundler and pnpm directly behind `bin/*`; do not retain aube; use `Procfile.dev` and Foreman behind `bin/dev`, and have Amp invoke the same repository commands | One visible command contract is easier for humans, CI, and agents to understand and maintain |
 | Data | PostgreSQL | Portable across exe.dev, Render, and Fly; supports web/worker processes, snapshots, search, jobs, and future growth |
 | Testing | Minitest for Rails, Vitest/React Testing Library for React, and Playwright for browser flows | Uses Rails-native conventions while retaining focused frontend and end-to-end verification |
 | Jobs | Solid Queue | Rails-native durable jobs backed by owned database infrastructure |
+| Queue topology | Keep Solid Queue in the same logical PostgreSQL database initially, with its own tables and pool; split only after measured contention or scaling evidence | Minimizes operations for small apps without preventing a later database split |
+| Database release | Run `bin/rails db:prepare` exactly once in a Compose one-shot release container, Render pre-deploy command, or Fly release command before updated web/worker processes; use expand/migrate/contract for non-atomic changes | Makes schema changes explicit and avoids migration races in every process startup |
+| Retry policy | No blanket retries; retry only categorized transient failures with bounded exponential backoff, jitter, `Retry-After`, and a five-attempt default for safe work; discard permanent failures and keep unknown failures visible | Retries improve resilience only when failure classification and mutation safety are explicit |
 | Files | Active Storage | Local disk on owned VMs and S3-compatible adapters on PaaS |
+| Storage profiles | Use disk for development and small exe.dev apps, S3-compatible storage for PaaS/horizontal scale, and optional MinIO only for Compose/CI compatibility verification | Preserves the cheapest local path without pretending local disk supports horizontal deployment |
 | Email | Action Mailer | Framework-owned delivery boundary with optional SMTP/provider adapters |
+| Email delivery | Generic SMTP is the baseline, including Google Workspace relay; use Mailpit in development and the Action Mailer test adapter in tests; keep Postmark/Resend/SES as optional recipes | SMTP is portable and sufficient without requiring a transactional-email vendor |
 | Rails-native facilities | Keep Solid Queue, Active Storage, and Action Mailer installed in the foundation; profiles generate/configure workflows rather than removing framework subsystems | Avoids a brittle combination matrix while keeping provider and user-facing features optional |
 | Application identity | First-party users, provider identities, and database sessions | Provider login maps into a stable app-owned user rather than becoming the user model |
 | Registration | Closed by default with explicit active access grants | Every app needs control over who may join; unauthorized Google users must not create local accounts |
@@ -33,20 +41,24 @@ No decision in this file means the feature has been implemented.
 | Hosts | First-class exe.dev, Render, and Fly.io recipes | Matches personal and work deployment needs without dominating architecture |
 | Amp | First-class `.agents/setup`, `.agents/resume`, `.amp/services.yaml`, and deterministic agent login | Future sessions and orbs must run and test the app without bespoke recovery work |
 | Integrations | Standardize HTTP safety, durable operations, audit, progress, and testing; keep provider behavior app-local | Real repositories repeat operational concerns, not business APIs |
+| Integration HTTP and parsing | Use Faraday plus retry middleware and explicit parser objects returning Ruby `Data`; do not add `dry-schema` initially | Establishes a boring, testable boundary without a premature validation framework |
+| Integration state | Install durable `operations` in the internal/integrations capability with actor, kind/status, optional idempotency key, step/progress, sanitized request/result summaries, error, and lifecycle timestamps; keep `operation_items` optional | Covers long-running internal-tool work while keeping batch row detail out of the core capability |
+| Audit | Share one sanitized `audit_events` table across authentication, access administration, and external commands | One application-owned audit trail is easier to secure, query, and retain consistently |
+| Progress | Poll a small same-origin JSON status endpoint every two seconds while active, back off toward ten seconds, pause while hidden, stop when terminal, and resume after reload | Durable visible progress does not require a public API, OpenAPI, TanStack Query, SSE, or WebSockets |
+| Shared provider pacing | Use Solid Queue concurrency limits ordinarily and a PostgreSQL lease/token bucket for strict account-wide quotas; never use process-local rate limits for shared quotas | Multiple workers must coordinate against the provider's real account-wide limit |
+| Secret source | Deployment/provider secrets live canonically in environment variables; Rails encrypted credentials are reserved for framework material, with no fallback precedence for the same key | A single source per secret prevents environment-dependent surprises and remains portable across hosts |
+| Secret workflow | Commit safe names in `.env.example`, ignore `.env.local`, use `dotenv-rails` only in development/test, inject Orb secrets, and make `bin/doctor` report names rather than values | Supports fast setup without writing or leaking credentials |
+| Observability core | Every profile gets structured JSON logs, correlation IDs, redaction, health/readiness, container log-rotation guidance, and `Rails.error` as the owned error-reporting boundary | Supplies portable operational basics while allowing optional error-reporting vendors |
+| OpenTelemetry | Keep it a separate capability included by `internal`, absent from `minimal` and `personal`, instrument Rails/Active Record/Solid Queue/Faraday, and export only when OTLP is configured | Internal integrations benefit from traces without burdening every small personal app |
+| Telemetry retention | Guide toward 30 days of logs and 7 days of traces, never log provider bodies, and leave audit/sensitive-data retention application-specific | Gives an operational starting point without imposing unsafe universal deletion rules |
 | Feature selection | Build-time profiles and additive generators/recipes; environment variables only configure installed code | Personal apps must contain no dormant institutional integrations |
+| Starter receipt | Check in `.starter.yml` with the generated profile, selected capabilities/recipes, and starter version | Gives humans and agents upgrade context without a runtime feature registry |
 | Validation | Rebuild Event Horizon first, then LX Internal Tools | The apps test complementary personal and internal-tool boundaries |
 
-## Proposed implementation choices
+## Evidence-driven choices
 
-| Area | Proposal | Review gate |
+| Area | Current default | Review gate |
 |---|---|---|
-| Package management | Bundler for Ruby and pnpm for frontend dependencies, without a workspace unless a real second package appears | Confirm during skeleton spike |
-| HTTP | Faraday with standardized timeout, retry, redaction, and instrumentation middleware | Validate against one fixture provider |
-| Response parsing | Small explicit parsers returning Ruby `Data` objects; add dry-schema only if repetition justifies it | Compare ergonomics in integration vertical slice |
-| Basic observability | Structured production logs and correlation IDs in every profile | Implement in foundation |
-| OpenTelemetry | Selectable capability, enabled by default for the internal profile and configured through OTLP | Validate maintenance cost before making universal |
-| Integration state | `operations` and `audit_events` in the internal/integrations capability, not the minimal personal profile | Validate during LX vertical slice |
-| Starter receipt | Checked-in `.starter.yml` records profile, feature list, recipes, and starter version | Implement with generator work |
 | Search | PostgreSQL full-text search recipe first; pgvector only after demonstrated semantic-search need | Deferred until a validation app requires search |
 
 ## Rejected as defaults

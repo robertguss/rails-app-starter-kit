@@ -10,9 +10,10 @@ Rails app, add dependencies, or implement application code until Robert
 explicitly approves the implementation phase. Documentation corrections and
 design refinements are allowed when requested.
 
-Robert accepted the six foundational preimplementation decisions recorded in
-`docs/decision-register.md` on 2026-08-24. That acceptance resolves the design
-blockers but does not authorize Phase 1 implementation.
+Robert accepted the foundational preimplementation decisions and cross-cutting
+implementation defaults recorded in `docs/decision-register.md` on 2026-08-24.
+That acceptance resolves the design blockers but does not authorize Phase 1
+implementation.
 
 Start every session by reading:
 

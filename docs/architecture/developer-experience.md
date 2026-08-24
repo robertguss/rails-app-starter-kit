@@ -1,6 +1,6 @@
 # Developer Experience and Amp Orbs
 
-Status: accepted direction; exact scripts are proposed
+Status: accepted direction and implementation defaults
 
 Last updated: 2026-08-24
 
@@ -24,6 +24,21 @@ bin/orb-dev     bind to $PORT, respect $PUBLIC_URL, and serve the Orb workflow
 
 Commands must be non-interactive when requested, fail clearly, and avoid
 silently using production credentials.
+
+Use Bundler and pnpm directly. Do not retain aube as a package or task layer.
+`bin/*` is the unified human, CI, and agent interface.
+
+Outside Amp, `bin/dev` runs Foreman against this process definition:
+
+```text
+# Procfile.dev
+web:    bin/rails server
+vite:   bin/vite dev
+worker: bin/jobs
+```
+
+Amp services invoke the same repository commands rather than maintaining a
+second process contract.
 
 ## Amp files
 
@@ -59,6 +74,9 @@ Declare supervised services and readiness:
 - review widget enabled for UI review unless a page requires otherwise.
 
 Generated `.amp/portals/*.json` files must be ignored.
+Orb/workspace secrets are injected by the environment; `.agents/setup` must
+never copy them into repository files. The normal fixture-provider mode must
+work without provider credentials.
 
 ## Browser access and agent authentication
 

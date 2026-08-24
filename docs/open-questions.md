@@ -3,9 +3,10 @@
 Last updated: 2026-08-24
 
 These questions are deliberately visible so future agents do not silently turn
-proposals into facts. Robert accepted all six foundational decisions below on
-2026-08-24. No unresolved design blocker remains, but Phase 1 implementation
-still requires separate explicit authorization.
+proposals into facts. Robert accepted the six foundational decisions and all
+cross-cutting implementation defaults below on 2026-08-24. No unresolved
+starter-design blocker remains, but Phase 1 implementation still requires
+separate explicit authorization.
 
 ## Resolved foundational decisions
 
@@ -60,51 +61,107 @@ foundation facilities. Profiles decide which workflows and deployment roles
 are generated/configured. Integrations, operation models, imports, and provider
 code remain optional.
 
-## Decisions needed during baseline implementation
+## Resolved cross-cutting implementation defaults
 
 ### Frontend
 
-- Exact restrained shadcn component list
-- Whether any page-prop type generation is worth its complexity
-- Whether pnpm remains the frontend manager or aube is retained as a task layer
-- Development process supervisor for Rails + Vite + worker outside Amp
+- Install only `alert`, `avatar`, `badge`, `button`, `card`, `checkbox`,
+  `dialog`, `dropdown-menu`, `input`, `label`, `progress`, `select`,
+  `separator`, `sheet`, `skeleton`, `sonner`, `table`, `tabs`, `textarea`, and
+  `tooltip` from shadcn initially.
+- Do not baseline calendars, charts, command palettes, editors, drag/drop, or a
+  generic data-table abstraction.
+- Use Inertia forms and Rails validation errors. Add React Hook Form or Zod
+  only when a specific interactive form justifies duplicate client validation.
+- Keep explicit TypeScript page-prop interfaces beside pages; do not generate
+  them from Ruby initially. Protect contracts with controller/request tests,
+  TypeScript compilation, and representative browser tests.
+- Use Bundler and pnpm directly behind `bin/*`; do not retain aube.
+- Run Rails, Vite, and the worker through `Procfile.dev` plus Foreman behind
+  `bin/dev`. Amp services invoke the same repository commands.
 
 ### Database and jobs
 
-- Solid Queue tables in the primary application database versus a separate
-  queue database on the same PostgreSQL server
-- Migration/release behavior when web and worker deploy separately
-- Default job retry/discard conventions and stale-job visibility
+- Keep Solid Queue in the same logical PostgreSQL database initially with its
+  own tables and pool. Split only after measured contention/scaling evidence.
+- Run `bin/rails db:prepare` once before updated web/worker processes through a
+  Compose one-shot release container, Render pre-deploy, or Fly release
+  command. Never auto-migrate in every process startup; use
+  expand/migrate/contract for non-atomic changes.
+- Do not apply blanket retries. Retry categorized transient failures only with
+  bounded exponential backoff, jitter, `Retry-After`, and a default maximum of
+  five attempts for safe work. Discard permanent auth/request/configuration
+  failures. External writes require idempotency or reconciliation; unknown and
+  ambiguous failures remain visible rather than being blindly retried.
+- Use durable operation state and stale-heartbeat checks for user-visible work.
 
 ### Secrets
 
-- Canonical precedence between environment variables and Rails encrypted
-  credentials
-- Local secret workflow for agents without allowing secrets into commits/logs
-- Default production secret rotation documentation
+- Environment variables are canonical for deployment/provider secrets. Rails
+  encrypted credentials are reserved for framework material where Rails
+  expects them; the same key never has both sources or a fallback precedence.
+- Commit safe names/defaults only in `.env.example`, ignore `.env.local`, and
+  load dotenv only in development/test.
+- Amp fixture mode requires no provider secrets. Orb/workspace secrets are
+  injected and never written by `.agents/setup`; `bin/doctor` reports missing
+  names but never values.
+- Provider recipes document ownership, location, scopes, consumers, rotation,
+  overlap, verification, and rollback. Rotation follows risk/provider
+  capability rather than a fake universal 90-day rule.
 
 ### Email and storage
 
-- Portable SMTP as only baseline delivery adapter versus one recommended
-  transactional provider recipe
-- Local email capture tool
-- S3-compatible test service in Compose versus stubs in normal development
+- Generic Action Mailer SMTP is the portable baseline, including Google
+  Workspace relay. Postmark, Resend, SES, and other providers are later
+  recipes.
+- Use Mailpit in development and the Action Mailer test adapter in tests.
+- Use local Active Storage disk for development and small exe.dev apps, and
+  S3-compatible storage for Render/Fly/horizontal scale.
+- Do not run MinIO everywhere. Keep it as an optional Compose/CI compatibility
+  profile; normal tests use disk or SDK stubs as appropriate.
 
 ### Observability
 
-- OpenTelemetry universal, internal-profile default, or separate capability
-- Default error reporter integration point
-- Metrics/logging gems and data-retention defaults
+- Every profile gets structured JSON production logs, request/job/operation
+  correlation IDs, redaction, health/readiness endpoints, and container
+  log-rotation guidance.
+- `Rails.error` is the app-owned error-reporting boundary; commercial reporters
+  are optional adapters.
+- OpenTelemetry is a separate capability, included by `internal` and absent
+  from `minimal`/`personal`. It instruments Rails, Active Record, Solid Queue,
+  and Faraday and exports only when OTLP is configured.
+- Start with 30-day log and 7-day trace guidance. Never log provider response
+  bodies. Audit, sensitive snapshot, and upload retention remain
+  application-specific.
 
 ### Integration support
 
-- Faraday confirmation after a Ruby implementation spike
-- Plain parsers/Data objects versus dry-schema/dry-validation
-- Exact `operations` schema and whether `audit_events` is shared with auth
-- Polling interval/backoff and Inertia partial-reload versus a small JSON status
-  endpoint
-- Shared rate limiting across multiple workers when a provider has account-wide
-  quotas
+- Use Faraday plus retry middleware and explicit parsers returning Ruby `Data`;
+  do not add `dry-schema` initially.
+- The internal/integrations capability installs durable `operations` with
+  `kind`, `status`, `actor_id`, optional `idempotency_key`, `current_step`,
+  current/total progress, sanitized request/result summaries, error
+  category/message, and heartbeat/start/finish timestamps. Enforce unique
+  `(kind, idempotency_key)` when the key is present.
+- Share one sanitized `audit_events` table across auth, access, and external
+  commands. Keep `operation_items` an optional batch recipe.
+- Poll a small same-origin JSON status endpoint every two seconds while active,
+  back off toward ten seconds, pause while hidden, stop when terminal, and
+  resume after reload. This does not imply a public API, OpenAPI, or TanStack
+  Query.
+- Use Solid Queue concurrency limits ordinarily. Use a PostgreSQL lease/token
+  bucket for strict shared provider pacing, keep provider quota behavior in
+  provider recipes, and never rely on in-memory limits across workers.
+
+## Remaining implementation research, not design blockers
+
+- Resolve and pin current compatible framework, runtime, gem, and package
+  versions from authoritative sources when Phase 1 starts.
+- Inspect the current Rails authentication generator before extending its
+  schema in Phase 3.
+- Validate the accepted defaults through the planned skeleton and fake-provider
+  vertical slices. Change them only when measured implementation evidence
+  contradicts the decision.
 
 ## Event Horizon questions
 
