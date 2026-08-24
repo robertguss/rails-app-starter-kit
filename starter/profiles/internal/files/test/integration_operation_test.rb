@@ -66,6 +66,19 @@ class IntegrationOperationTest < ActiveSupport::TestCase
     assert_equal "ambiguous_write", ambiguous.items.find_by!(external_key: "record-1").error_category
   end
 
+  test "a successfully reconciled item clears its previous failure metadata" do
+    operation = operation_for("success")
+    item = operation.items.create!(external_key: "retryable")
+    item.fail!(category: "timeout", message: "Provider timed out")
+
+    item.succeed!(summary: { outcome: "reconciled" })
+
+    assert_equal "succeeded", item.status
+    assert_equal({ "outcome" => "reconciled" }, item.result_summary)
+    assert_nil item.error_category
+    assert_nil item.error_message
+  end
+
   test "an interrupted operation retains its claim and resumes only after it is stale" do
     operation = operation_for("interruption")
 

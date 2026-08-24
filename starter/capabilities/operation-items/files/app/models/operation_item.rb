@@ -7,7 +7,13 @@ class OperationItem < ApplicationRecord
   validates :status, inclusion: { in: %w[pending succeeded failed] }
 
   def succeed!(summary: {})
-    update!(status: "succeeded", result_summary: summary, finished_at: Time.current)
+    update!(
+      status: "succeeded",
+      result_summary: summary,
+      error_category: nil,
+      error_message: nil,
+      finished_at: Time.current
+    )
   end
 
   def fail!(category:, message:)
