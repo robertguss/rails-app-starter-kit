@@ -1,7 +1,6 @@
 require "uri"
 
 module RuntimeConfiguration
-  ALLOWED_AUTH_METHODS = %w[google password].freeze
   ALLOWED_STORAGE_SERVICES = %w[local s3].freeze
   ALLOWED_MAIL_METHODS = %w[none smtp].freeze
 
@@ -15,8 +14,6 @@ module RuntimeConfiguration
 
   def self.invalid_names(environment: ENV)
     invalid = []
-    methods = list(environment.fetch("AUTH_METHODS", "password"))
-    invalid << "AUTH_METHODS" if methods.empty? || (methods - ALLOWED_AUTH_METHODS).any?
     return invalid unless environment.fetch("RAILS_ENV", "development") == "production"
 
     require_names(invalid, environment, %w[APP_HOST DATABASE_URL FORCE_SSL SECRET_KEY_BASE STORAGE_SERVICE MAIL_DELIVERY_METHOD])
@@ -36,15 +33,8 @@ module RuntimeConfiguration
     mail = environment["MAIL_DELIVERY_METHOD"].to_s
     invalid << "MAIL_DELIVERY_METHOD" unless ALLOWED_MAIL_METHODS.include?(mail)
     require_names(invalid, environment, %w[SMTP_ADDRESS SMTP_PORT SMTP_DOMAIN]) if mail == "smtp"
-
-    require_names(invalid, environment, %w[GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET GOOGLE_WORKSPACE_DOMAINS]) if methods.include?("google")
     invalid.uniq.sort
   end
-
-  def self.list(value)
-    value.to_s.split(",").map(&:strip).reject(&:empty?)
-  end
-  private_class_method :list
 
   def self.require_names(invalid, environment, names)
     invalid.concat(names.select { |name| environment[name].to_s.strip.empty? })

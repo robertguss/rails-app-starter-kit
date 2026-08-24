@@ -1,6 +1,6 @@
 # Baseline Starter-Kit Implementation Plan
 
-Status: Phases 1–2 implemented; Phases 3–7 authorized and in progress
+Status: Phases 1–5 implemented; Phases 6–7 authorized and in progress
 
 Last updated: 2026-08-24
 
@@ -145,6 +145,9 @@ Status: implemented on 2026-08-24. See the
 
 ## Phase 4 — Rails-native operational capabilities
 
+Status: implemented on 2026-08-24. See the
+[Phase 4 implementation record](implementation/phase-4.md).
+
 ### Work
 
 1. Configure Solid Queue in the same logical PostgreSQL database with its own
@@ -179,6 +182,9 @@ Status: implemented on 2026-08-24. See the
 - The same image is ready for PaaS recipes.
 
 ## Phase 5 — Profiles and additive recipe mechanism
+
+Status: implemented on 2026-08-24. See the
+[Phase 5 implementation record](implementation/phase-5.md).
 
 ### Work
 

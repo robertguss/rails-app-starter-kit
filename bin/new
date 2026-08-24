@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require_relative "../lib/starter/generator"
+
+options = { profile: "minimal", additions: [], lock: true }
+parser = OptionParser.new do |arguments|
+  arguments.banner = "Usage: bin/new NAME [--profile PROFILE] [--path PATH]"
+  arguments.on("--profile PROFILE", %w[minimal personal internal]) { |value| options[:profile] = value }
+  arguments.on("--auth METHOD", %w[none password google]) { |value| options[:auth] = value }
+  arguments.on("--with LIST", "Comma-separated capabilities or recipes") { |value| options[:additions] = value.split(",").map(&:strip).reject(&:empty?) }
+  arguments.on("--path PATH") { |value| options[:path] = value }
+  arguments.on("--[no-]lock", "Verify the generated Gemfile.lock (default: true)") { |value| options[:lock] = value }
+  arguments.on("--non-interactive", "Accepted for explicit automation; generation never prompts") {}
+end
+
+begin
+  parser.parse!
+  name = ARGV.shift
+  abort parser.to_s unless name && ARGV.empty?
+  destination = options[:path] || File.expand_path("../#{name}", Dir.pwd)
+
+  generator = Starter::Generator.new(root: Pathname(__dir__).join("..").expand_path)
+  generator.generate(name:, profile: options[:profile], destination:, auth: options[:auth], additions: options[:additions], lock: options[:lock])
+  receipt = YAML.safe_load(Pathname(destination).join(".starter.yml").read)
+  puts "Generated #{name} at #{Pathname(destination).expand_path}"
+  puts "Profile: #{receipt.fetch('profile')}"
+  puts "Features: #{receipt.fetch('features').join(', ')}"
+  recipe_list = receipt.fetch("recipes").join(", ")
+  puts "Recipes: #{recipe_list.empty? ? 'none' : recipe_list}"
+rescue OptionParser::ParseError, Starter::Error => error
+  warn "Generation failed: #{error.message}"
+  exit 1
+end

@@ -1,0 +1,51 @@
+starter_version: 0.1.0
+
+profiles:
+  minimal:
+    auth: none
+    capabilities:
+      - jobs
+      - storage
+      - email
+    overlays:
+      - common/files
+  personal:
+    auth: password
+    capabilities:
+      - closed-access
+      - password-auth
+      - jobs
+      - storage
+      - email
+    overlays:
+      - common/files
+      - capabilities/closed-access/files
+      - capabilities/password-auth/files
+      - profiles/personal/files
+  internal:
+    auth: google
+    capabilities:
+      - closed-access
+      - google-auth
+      - jobs
+      - storage
+      - email
+    overlays:
+      - common/files
+      - capabilities/closed-access/files
+      - capabilities/google-auth/files
+      - profiles/internal/files
+
+recipes:
+  upload-workflow:
+    requires_any:
+      - password-auth
+      - google-auth
+    files: recipes/upload-workflow/files
+    insertions:
+      - path: config/routes.rb
+        before: '  root "home#show"'
+        content: "  resources :uploads, only: %i[create show destroy]"
+      - path: app/models/user.rb
+        before: "  has_one :access_grant, foreign_key: :claimed_by_id, inverse_of: :claimed_by, dependent: :restrict_with_error"
+        content: "  has_many_attached :uploads"

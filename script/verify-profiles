@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+temporary_root="$(mktemp -d "${TMPDIR:-/tmp}/starter-profiles.XXXXXX")"
+generated_apps=()
+
+cleanup() {
+  for app in "${generated_apps[@]}"; do
+    if [[ -x "$app/bin/rails" ]]; then
+      (cd "$app" && bin/rails db:drop >/dev/null 2>&1 || true)
+      (cd "$app" && RAILS_ENV=test bin/rails db:drop >/dev/null 2>&1 || true)
+    fi
+  done
+  rm -rf "$temporary_root"
+}
+trap cleanup EXIT
+
+export BUNDLE_PATH="$temporary_root/bundle"
+
+assert_absent() {
+  local app="$1"
+  local pattern="$2"
+  local description="$3"
+  local matches
+  matches="$(cd "$app" && rg --files-with-matches --ignore-case "$pattern" . \
+    --glob '!node_modules/**' \
+    --glob '!public/vite*/**' \
+    --glob '!tmp/**' \
+    --glob '!vendor/**' \
+    --glob '!test-results/**' || true)"
+  if [[ -n "$matches" ]]; then
+    printf 'Generated output contains forbidden %s:\n%s\n' "$description" "$matches" >&2
+    return 1
+  fi
+}
+
+for profile in minimal personal internal; do
+  app="$temporary_root/$profile-fixture"
+  generated_apps+=("$app")
+
+  "$repo_root/bin/new" "$profile-fixture" \
+    --profile "$profile" \
+    --path "$app" \
+    --non-interactive
+
+  (
+    cd "$app"
+    bin/setup
+    bin/check
+  )
+
+  test ! -e "$app/starter"
+  test ! -e "$app/bin/new"
+  test ! -e "$app/lib/starter"
+  assert_absent "$app" 'CANVAS_|canvas_(client|api|base_url|access_token)|populi|airtable|watermark' "institutional provider code"
+  if [[ "$profile" != internal ]]; then
+    assert_absent "$app" 'GOOGLE_|omniauth|google_oauth' "Google authentication code"
+    assert_absent "$app" 'operation_items|fixture_provider|integrations/client|OTEL_' "internal integration code"
+  fi
+done
+
+personal="${generated_apps[1]}"
+changed="$($repo_root/bin/starter add upload-workflow --app "$personal")"
+printf '%s\n' "$changed"
+grep -q "app/controllers/uploads_controller.rb" <<<"$changed"
+grep -q "app/models/user.rb" <<<"$changed"
+grep -q "config/routes.rb" <<<"$changed"
+(
+  cd "$personal"
+  bin/rails test test/integration/uploads_flow_test.rb
+)
+
+echo "Generated minimal, personal, and internal profiles passed complete checks"
+echo "Additive upload workflow passed its integration check"

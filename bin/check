@@ -12,6 +12,9 @@ run() {
 
 run "Environment" bin/doctor --check
 run "Shell syntax" bash -n .agents/resume .agents/setup bin/backup bin/backup-prune bin/check bin/dev bin/docker-entrypoint bin/doctor bin/orb-dev bin/release bin/restore bin/restore-drill bin/setup bin/worker-health
+if [[ -d starter ]]; then
+  run "Starter command syntax" ruby -c bin/new bin/starter lib/starter/generator.rb
+fi
 run "Ruby style" bundle exec rubocop
 run "Frontend formatting" pnpm format:check
 run "Frontend lint" pnpm lint
@@ -25,5 +28,8 @@ run "Rails security scan" bundle exec brakeman --no-pager --quiet
 run "Ruby dependency audit" bundle exec bundle-audit check --update
 run "JavaScript dependency audit" pnpm audit --audit-level high --prod
 run "Browser tests" pnpm test:browser
+if [[ -d starter && "${STARTER_SKIP_PROFILE_CHECKS:-0}" != "1" ]]; then
+  run "Generated profile matrix" script/verify-profiles
+fi
 
 printf '\nAll checks passed\n'

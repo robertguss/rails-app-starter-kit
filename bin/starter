@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require_relative "../lib/starter/generator"
+
+options = {}
+parser = OptionParser.new do |arguments|
+  arguments.banner = "Usage: bin/starter add RECIPE --app PATH"
+  arguments.on("--app PATH") { |value| options[:app] = value }
+end
+begin
+  parser.parse!
+  command, recipe = ARGV
+  abort parser.to_s unless command == "add" && recipe && options[:app] && ARGV.length == 2
+
+  generator = Starter::Generator.new(root: Pathname(__dir__).join("..").expand_path)
+  changed = generator.apply_recipe(recipe, destination: options.fetch(:app))
+  if changed.empty?
+    puts "#{recipe} is already recorded; no files changed"
+  else
+    puts "Applied #{recipe}; changed:"
+    changed.each { |path| puts "  #{path}" }
+  end
+rescue OptionParser::ParseError, Starter::Error => error
+  warn "Recipe failed: #{error.message}"
+  exit 1
+end

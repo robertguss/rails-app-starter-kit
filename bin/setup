@@ -8,6 +8,9 @@ echo "==> Checking prerequisites"
 bin/doctor --setup
 
 echo "==> Installing locked Ruby dependencies"
+if [[ -z "${BUNDLE_PATH:-}" ]]; then
+  bundle config set --local path vendor/bundle
+fi
 bundle check >/dev/null 2>&1 || bundle install
 
 echo "==> Installing locked JavaScript dependencies"

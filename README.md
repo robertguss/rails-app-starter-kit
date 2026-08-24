@@ -3,10 +3,11 @@
 Provider-independent Rails application starter aimed at small internal tools and
 personal or family applications.
 
-The project now contains the reviewed Rails/Inertia foundation, deterministic
-developer/CI/Amp Orb workflow, first-party closed-access authentication, and
-Rails-native jobs/files/mail with portable image and recovery tooling.
-Authorized implementation of the remaining baseline phases is in progress.
+The project contains a runnable minimal Rails/Inertia reference app,
+deterministic developer/CI/Amp Orb workflow, Rails-native jobs/files/mail,
+portable image and recovery tooling, and build-time profiles for first-party
+closed-access authentication. Authorized implementation of the remaining
+baseline phases is in progress.
 
 ## Why this project exists
 
@@ -42,6 +43,24 @@ bin/dev
 bin/check
 ```
 
+Generate an independent application without the starter catalog or unselected
+capabilities:
+
+```text
+bin/new family-app --profile personal --path ../family-app --non-interactive
+bin/new staff-tool --profile internal --path ../staff-tool --non-interactive
+```
+
+`minimal` has no authentication, `personal` installs password closed access, and
+`internal` installs Google Workspace closed access. Each output records its
+expanded build-time selection in `.starter.yml`; production code never reads
+that receipt as a feature registry. A versioned starter checkout can apply an
+additive recipe and report every changed file:
+
+```text
+bin/starter add upload-workflow --app ../family-app
+```
+
 ## Start here
 
 1. [Documentation index](docs/README.md)
@@ -72,7 +91,7 @@ will be copied into the starter.
 
 - Documentation baseline: foundational and cross-cutting implementation defaults
   accepted
-- Application implementation: Phases 1–4 complete; Phases 5–7 in progress
+- Application implementation: Phases 1–5 complete; Phases 6–7 in progress
 - Implementation authorization: Phases 1–7 granted
 - GitHub repository: private repository created at
   <https://github.com/robertguss/rails-app-starter-kit>

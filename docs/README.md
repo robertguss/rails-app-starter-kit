@@ -1,6 +1,6 @@
 # Documentation Index
 
-Status: Phases 1–4 implemented; Phases 5–7 in progress
+Status: Phases 1–5 implemented; Phases 6–7 in progress
 
 Last updated: 2026-08-24
 
@@ -38,6 +38,7 @@ This index is the durable entry point for future Amp sessions and fresh orbs.
 - [Phase 2 implementation record](implementation/phase-2.md)
 - [Phase 3 implementation record](implementation/phase-3.md)
 - [Phase 4 implementation record](implementation/phase-4.md)
+- [Phase 5 implementation record](implementation/phase-5.md)
 - [Operations runbook](operations.md)
 - [Combined roadmap](roadmap.md)
 - [Event Horizon rebuild roadmap](roadmaps/james-reading-app.md)

@@ -14,21 +14,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
-import type { SharedPageProps } from "@/types/page"
 
-interface NavigationItem {
-  href: string
-  label: string
-}
-
-const foundationNavigation: NavigationItem[] = [
+const navigation = [
   { href: "/", label: "Foundation" },
   { href: "/states/empty", label: "Empty" },
   { href: "/states/loading", label: "Loading" },
   { href: "/health", label: "Health" },
 ]
 
-function NavigationLink({ href, label }: NavigationItem) {
+function NavigationLink({ href, label }: (typeof navigation)[number]) {
   const { url } = usePage()
   const active = href === "/" ? url === href : url.startsWith(href)
 
@@ -48,12 +42,6 @@ function NavigationLink({ href, label }: NavigationItem) {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const user = usePage<SharedPageProps>().props.auth.user
-  const navigation = user
-    ? user.role === "owner"
-      ? [...foundationNavigation, { href: "/settings/access", label: "Access" }]
-      : foundationNavigation
-    : []
 
   return (
     <div className="flex min-h-svh flex-col bg-background">
@@ -85,27 +73,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="ml-auto flex items-center gap-1 md:ml-2">
-            {user ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="hidden sm:inline-flex"
-              >
-                <Link href="/logout" method="delete" as="button">
-                  Sign out
-                </Link>
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="hidden sm:inline-flex"
-              >
-                <Link href="/login">Sign in</Link>
-              </Button>
-            )}
             <ThemeToggle />
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>

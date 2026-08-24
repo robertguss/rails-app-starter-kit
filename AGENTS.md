@@ -5,15 +5,18 @@ application starter kit.
 
 ## Current phase
 
-Phases 1–3 are implemented; Phases 4–7 are authorized. Authentication remains
-closed-access: never store raw auth tokens, bypass active grants, weaken the
-single-owner database/application safeguards, or expose agent login outside
-development and explicit non-production browser-test mode.
+Phases 1–5 are implemented; Phases 6–7 are authorized. The runnable source is
+the unauthenticated `minimal` foundation. Authentication is installed only into
+generated profiles and remains closed-access: never store raw auth tokens,
+bypass active grants, weaken the single-owner database/application safeguards,
+or expose agent login outside development and explicit non-production
+browser-test mode.
 
 Robert accepted the foundational preimplementation decisions and cross-cutting
 implementation defaults recorded in `docs/decision-register.md` on 2026-08-24.
 The implemented Phase 1 boundary and selected versions are recorded in
-`docs/implementation/phase-1.md`.
+`docs/implementation/phase-1.md`; later phase records are in
+`docs/implementation/`.
 
 Start every session by reading:
 
@@ -79,4 +82,10 @@ bin/setup       # idempotent fresh-clone setup
 bin/dev         # local development
 bin/check       # complete deterministic verification
 bin/orb-dev     # Amp Orb service entrypoint
+script/verify-profiles # generate and fully check minimal/personal/internal
 ```
+
+`starter/` is build-time source only. Generated applications must not depend on
+it at runtime or retain unselected authentication, integration, or provider
+code. When changing an overlay, verify the generated profile rather than only
+the runnable minimal source.
