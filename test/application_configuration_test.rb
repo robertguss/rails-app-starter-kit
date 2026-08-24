@@ -24,6 +24,10 @@ class ApplicationConfigurationTest < ActiveSupport::TestCase
     assert_includes compose, "command: bin/release"
     assert_includes compose, "command: bin/jobs start"
 
+    check = Rails.root.join("bin/check").read
+    assert_includes check, "RAILS_ENV=test bin/rails db:test:prepare"
+    refute_includes check, "RAILS_ENV=test bin/rails db:prepare"
+
     %w[backup backup-prune config-check docker-entrypoint release restore restore-drill worker-health].each do |script|
       assert_predicate Rails.root.join("bin", script), :executable?
     end

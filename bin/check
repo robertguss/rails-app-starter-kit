@@ -19,7 +19,7 @@ run "Ruby style" bundle exec rubocop
 run "Frontend formatting" pnpm format:check
 run "Frontend lint" pnpm lint
 run "TypeScript" pnpm typecheck
-run "Database" env RAILS_ENV=test bin/rails db:prepare
+run "Clean test database" env RAILS_ENV=test bin/rails db:test:prepare
 run "Ruby tests" bin/rails test
 run "Frontend tests" pnpm test
 run "Production assets" env RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile

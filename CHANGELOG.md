@@ -5,6 +5,8 @@
 - Generated profiles now carry their selected authentication method into the
   Compose examples and consistently rename Compose, PostgreSQL, Render, MinIO,
   and Orb service identities instead of retaining starter-owned names.
+- `bin/check` now resets the test database before Ruby tests so durable records
+  created by browser tests cannot make a subsequent check fail.
 
 ## 0.1.0 — 2026-08-24
 
