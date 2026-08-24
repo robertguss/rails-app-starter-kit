@@ -4,8 +4,6 @@
 
 module Integrations
   module FixtureProvider
-    class SimulatedInterruption < StandardError; end
-
     class Factory
       def self.build(simulation: "success")
         stubs = Faraday::Adapter::Test::Stubs.new
